@@ -57,7 +57,7 @@ PLAY RECAP *********************************************************************
 localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0
 ```
 
-Создание субдомена
+### Создание субдомена
 ```
 root@ansible:/etc/ansible/porkbun-dns# ansible-playbook playbooks/create_record.yml
 Имя субдомена (например, demo): vpn-domen
