@@ -17,13 +17,13 @@ root@ansible:/etc/ansible/porkbun-dns# tree
     └── swap_record.yml
 ```
 
-ansible.cfg - главный конфигурационный файл Ansible (описывает инвентори, способ подключения по SSH, формат вывода информации, например в YAML) 
-group_vars/all - в данном файле хранятся  глобальные переменные применяемые ко всем хостам указанные в инвентори
-playboos/list_records.yml - список всех текущих субдоменов
-playbooks/create_record.yml - создание А-записи для субдомена
-playbooks/delete_record.yml - удаление А-записи для субдомена
-playbooks/find_record_by_ip.yml = поиск А-записи по ip адресу
-playbooks/swap_record.yml -меняет ip адрес А-записи  указанного субдомена из списка лист
+- ansible.cfg - главный конфигурационный файл Ansible (описывает инвентори, способ подключения по SSH, формат вывода информации, например в YAML) 
+- group_vars/all - в данном файле хранятся  глобальные переменные применяемые ко всем хостам указанные в инвентори
+- playboos/list_records.yml - список всех текущих субдоменов
+- playbooks/create_record.yml - создание А-записи для субдомена
+- playbooks/delete_record.yml - удаление А-записи для субдомена
+- playbooks/find_record_by_ip.yml = поиск А-записи по ip адресу
+- playbooks/swap_record.yml -меняет ip адрес А-записи  указанного субдомена из списка лист
 
 ### Демонстрация работы нескольих плейбуков из списка  
 
