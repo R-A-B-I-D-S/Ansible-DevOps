@@ -1,0 +1,50 @@
+---
+- name: ➕ Создать A-запись для субдомена
+  hosts: localhost
+  gather_facts: no
+  vars_prompt:
+    - name: subdomain
+      prompt: "Имя субдомена (например, demo)"
+      private: no
+    - name: target_ip
+      prompt: "IP-адрес (например, 1.1.1.1)"
+      private: no
+
+  tasks:
+
+#    - name: 🔍 Проверить, существует ли уже A-запись
+#      uri:
+#        url: "https://api.porkbun.com/api/json/v3/dns/retrieve/    {{ porkbun_domain }}"
+#        method: POST
+#        body:
+#          apikey: "{{ porkbun_api_key }}"
+#          secretapikey: "{{ porkbun_secret_api_key }}"
+#        body_format: json
+#        return_content: yes
+#      register: existing
+
+#    - name: 🧩 Поиск существующей записи
+#      set_fact:
+#        record_exists: true
+#      when: item.name == (subdomain + '.' + porkbun_domain) and item.type == "A"
+#      loop: "{{ existing.json.records }}"
+
+    - name: 🚀 Создать A-запись
+      when: record_exists is not defined
+      uri:
+        url: "https://api.porkbun.com/api/json/v3/dns/create/{{ porkbun_domain }}"
+        method: POST
+        body:
+          apikey: "{{ porkbun_api_key }}"
+          secretapikey: "{{ porkbun_secret_api_key }}"
+          name: "{{ subdomain }}"
+          type: "A"
+          content: "{{ target_ip }}"
+          ttl: "300"
+        body_format: json
+        status_code: 200
+      register: create_result
+
+    - name: ✅ Отчёт
+      debug:
+        msg: "{{ '✅ Создана: ' + subdomain + '.' + porkbun_domain + ' → ' + target_ip if create_result is succeeded else '🟡 Уже существует' }}"
