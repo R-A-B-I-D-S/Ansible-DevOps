@@ -201,7 +201,7 @@ localhost                  : ok=11   changed=0    unreachable=0    failed=0    s
 
 ```
 
-###Смена IP в записи (удаление + создание)
+### Смена IP в записи (удаление + создание)
 ```
 root@ansible:/etc/ansible/porkbun-dns# ansible-playbook playbooks/swap_record.yml
 
@@ -300,7 +300,7 @@ localhost                  : ok=15   changed=0    unreachable=0    failed=0    s
 
 ```
 
-###Поиск записей по IP
+### Поиск записей по IP
 ```
 Введите IP-адрес для поиска: 5.5.5.5
 
