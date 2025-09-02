@@ -1,0 +1,26 @@
+---
+all:
+  children:
+    new_servers:
+      hosts:
+        new-server-2:
+          ansible_host: xx-xx-xx-xx
+          ansible_user: example_user
+          ansible_port: 22
+          ansible_password: example_password
+          server_domain: "vpn-2.example.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-2"
+
+        new-server-3:
+          ansible_host: xx-xx-xx-xx
+          ansible_user: sample_user
+          ansible_port: 22
+          ansible_password: example_password
+          server_domain: "vpn-3.example.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-3"
+
+  hosts:
+    localhost:
+      ansible_connection: local
