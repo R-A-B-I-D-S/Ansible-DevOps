@@ -1,0 +1,10 @@
+---
+zabbix_api_password: "zabbix"
+zabbix_server_fqdn: "zabbix.tgvpnbot.com"
+zabbix_api_user: "zabbixtg"
+zabbix_api_token: 96fd9ab745342a5a97a24b53e64c26fc490cc7ad7af8e4636247e6d4b0687ddf
+zabbix_agent_plugins:
+  - zabbix-agent2-plugin-mongodb
+  - zabbix-agent2-plugin-mssql
+  - zabbix-agent2-plugin-postgresql
+zabbix_api_url: "https://{{ zabbix_server_fqdn }}/api_jsonrpc.php"

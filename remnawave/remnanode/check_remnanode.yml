@@ -1,0 +1,21 @@
+- name: Создать новую ноду через RemnaWave API
+  hosts: localhost
+  gather_facts: no
+  vars:
+    api_token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMWMxMzAzMWQtYTg1My00NDliLTk5OWEtOTdlOWUzOTk4OGVkIiwidXNlcm5hbWUiOm51bGwsInJvbGUiOiJBUEkiLCJpYXQiOjE3NTY5ODAyMDEsImV4cCI6MTAzOTY4OTM4MDF9.6uRkmhrg6GY9ggv6q-VPB7EvkE447VGYBeIv_6yF0pY"
+    api_url: "https://remnawave.tgvpnbot.com/api/nodes"
+  tasks:
+    - name: Получить список всех нод (свежий список с учётом новой)
+      uri:
+        url: "{{ api_url }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        return_content: yes
+      register: node_status_response  
+ 
+
+    - name: Сохранить UUID новой ноды
+      set_fact:
+        new_node_uuid: "{{ node_status_response.json.response.uuid }}"
+

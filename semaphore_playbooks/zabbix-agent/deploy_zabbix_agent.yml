@@ -1,0 +1,6 @@
+---
+- name: Deploy Zabbix Agent 2 on Ubuntu 24.04
+  hosts: new_servers
+  become: yes
+  roles:
+    - zabbix_agent

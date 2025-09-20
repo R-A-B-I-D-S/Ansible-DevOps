@@ -1,0 +1,20 @@
+:root{
+  --brand:#2563eb;
+  --accent:#34d399;
+}
+.brand-dot{
+  width:12px;height:12px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 0 2px #fff, 0 0 0 6px rgba(52,211,153,.25);
+}
+.btn-primary{
+  background-color:var(--brand);border-color:var(--brand);
+}
+.btn-primary:hover{filter:brightness(.95)}
+.bg-primary-subtle{background-color:rgba(37,99,235,.08)!important}
+.text-primary{color:var(--brand)!important}
+/* Мелкие правки карточек */
+.card{border-color:#e9eef5}
+.card-title{font-weight:700}
+
+
+

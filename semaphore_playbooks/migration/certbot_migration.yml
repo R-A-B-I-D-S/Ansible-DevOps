@@ -1,0 +1,33 @@
+---
+- name: Установка SSL сертификатов через Certbot
+  hosts: actual_servers
+  become: yes
+  vars:
+      certbot_domain: "{{ server_domain }}"
+  tasks:
+      - name: Остановить сервисы, которые могут использовать порт 80
+        systemd:
+            name: "{{ item }}"
+            state: stopped
+        loop:
+            - nginx
+            - apache2
+            - caddy
+        ignore_errors: yes
+
+      - name: Получить SSL сертификат через Certbot standalone
+        command: certbot certonly --standalone --agree-tos --register-unsafely-without-email -d {{ certbot_domain }}
+        args:
+            creates: /etc/letsencrypt/live/{{ certbot_domain }}/fullchain.pem
+
+      - name: Перезагрузить службу 3x-ui
+        systemd:
+            name: x-ui
+            state: restarted
+            enabled: yes
+
+      - name: Перезагрузить службу 3x-ui
+        systemd:
+            name: fail2ban
+            state: restarted
+            enabled: yes

@@ -1,0 +1,20 @@
+all:
+  children:
+    new_servers:
+      hosts:
+        new-server-1:
+          ansible_host: 11.11.11.11
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: b0G!Z17YEz
+          server_domain: "my-project.officialbot.org"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "new-server-1"
+        new-server-2:
+          ansible_host: 192.168.10.1
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: b0G!Z17YEz
+          server_domain: "test-vps.officialbot.org"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "new-server-1"

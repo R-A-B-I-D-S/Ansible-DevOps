@@ -1,0 +1,59 @@
+:root{--bg:#faf7f2;--card:#ffffff;--line:#e8e2d9;--accent:#c2410c;--accent2:#0ea5e9;--text:#2b2b2b;--muted:#6b7280}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell;color:var(--text);background:var(--bg)}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+.muted{color:var(--muted)}
+.btn{display:inline-block;background:var(--accent);color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:700}
+.btn:hover{filter:brightness(.95)}
+.btn-secondary{background:var(--accent2);color:#07202a}
+.site-header{position:sticky;top:0;background:#ffffffcc;backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:12px;align-items:center}
+.brand-mark{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 2px #fff, 0 0 0 6px #ffe6d9}
+.nav a{color:var(--text);text-decoration:none;margin-left:16px}
+.nav a:hover{opacity:.85}
+.notice{background:#111;color:#fff;text-align:center;padding:6px 10px;font-size:13px}
+.hero{padding:32px 0;background:linear-gradient(180deg,#fff, #f3efe8)}
+.hero-inner{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center}
+.hero-text h1{margin:0 0 8px;font-size:40px;line-height:1.15}
+.lead{color:#4b5563;font-size:18px}
+.cta{display:flex;gap:12px;margin-top:16px}
+.hero-badge{border:1px solid var(--line);border-radius:16px;background:#fff;padding:18px}
+.bullets{margin:0;padding-left:18px;color:#4b5563}
+.section{padding:28px 0;border-top:1px solid var(--line);background:#fff}
+.section.alt{background:#faf7f2}
+.section.categories{padding:16px 0;background:#fff;border-top:none;border-bottom:1px solid var(--line)}
+.grid{display:grid;gap:16px}
+.chip-list{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-block;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:#333;text-decoration:none;font-size:14px}
+.chip.active{background:#111;color:#fff;border-color:#111}
+.layout{display:grid;grid-template-columns:260px 1fr;gap:20px}
+.sidebar{display:flex;flex-direction:column;gap:16px}
+.side-card{border:1px solid var(--line);border-radius:14px;background:#fff;padding:16px}
+.side-title{font-weight:700;margin-bottom:8px}
+.side-list{margin:0;padding-left:18px}
+.side-list a{text-decoration:none;color:#374151}
+.content{display:flex;flex-direction:column;gap:14px}
+.product-row{display:grid;grid-template-columns:140px 1fr;gap:16px;border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px}
+.product-media{background:linear-gradient(135deg,#f3efe8,#fff);border:1px solid var(--line);border-radius:10px}
+.product-top{display:flex;align-items:center;justify-content:space-between}
+.label{background:#f59e0b;color:#111;padding:2px 8px;border-radius:999px;font-size:12px}
+.label.alt{background:#10b981;color:#06281c}
+.product-meta{display:flex;align-items:center;gap:12px}
+.price{color:#c2410c;font-weight:700}
+.link{color:#0ea5e9;text-decoration:none}
+.note{margin-top:6px}
+.features .feature{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff}
+.shops{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.shop{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff}
+.shop-title{font-weight:700;margin-bottom:6px}
+.list{margin:0;padding-left:18px;color:#4b5563}
+.contacts{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.site-footer{border-top:1px solid var(--line);margin-top:24px;background:#fff}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;color:#6b7280;font-size:14px}
+.cta-bar{position:fixed;left:0;right:0;bottom:0;background:#111;color:#fff;border-top:1px solid #222}
+.cta-bar-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 24px}
+@media (max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{order:2}.content{order:1}.product-row{grid-template-columns:1fr}}
+@media (max-width:900px){.hero-inner{grid-template-columns:1fr}.grid.products{grid-template-columns:1fr}.nav a{margin-left:10px}.contacts{flex-direction:column}.shops{grid-template-columns:1fr}}
+

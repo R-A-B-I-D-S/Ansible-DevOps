@@ -1,0 +1,52 @@
+- name: Удаление obt
+  hosts: actual_servers
+  serial: 1
+  become: yes
+  tasks:
+      - name: Остановить и отключить obt.timer
+        ansible.builtin.systemd:
+            name: obt.timer
+            state: stopped
+            enabled: no
+        ignore_errors: yes
+
+      - name: Остановить и отключить obt.service
+        ansible.builtin.systemd:
+            name: obt.service
+            state: stopped
+            enabled: no
+        ignore_errors: yes
+
+      - name: Удалить systemd сервис obt.service
+        ansible.builtin.file:
+            path: /etc/systemd/system/obt.service
+            state: absent
+        ignore_errors: yes
+
+      - name: Удалить systemd таймер obt.timer
+        ansible.builtin.file:
+            path: /etc/systemd/system/obt.timer
+            state: absent
+        ignore_errors: yes
+
+      - name: Перезагрузить systemd daemon
+        ansible.builtin.systemd:
+            daemon_reload: yes
+        ignore_errors: yes
+
+      - name: Удалить бинарник obt
+        ansible.builtin.file:
+            path: /usr/local/bin/obt
+            state: absent
+        ignore_errors: yes
+
+      - name: Удалить конфигурационную директорию obt
+        ansible.builtin.file:
+            path: /root/.config/obt
+            state: absent
+        ignore_errors: yes
+
+      - name: Убить все процессы obt (на всякий случай)
+        ansible.builtin.shell:
+            cmd: pkill -f obt || true
+        ignore_errors: yes

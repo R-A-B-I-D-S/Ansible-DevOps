@@ -1,0 +1,13 @@
+---
+all:
+  children:
+    new_servers:
+      hosts:
+        new-emil-test:
+          ansible_host: 23.177.185.180
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: 0YU4gmd7H
+          server_domain: "test.example.org"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-test"

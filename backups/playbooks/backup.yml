@@ -1,0 +1,136 @@
+---
+- name: "Rsync Backup Infrastructure with Server Directories"
+  hosts: backups_servers
+  gather_facts: yes
+  vars:
+      timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
+      backup_report_file: "backup_info_{{ ansible_date_time.iso8601_basic_short }}.txt"
+      backup_log_dir: "{{ remote_backup_dir }}/backups_log"
+      local_backup_path: "{{ local_backup_dir }}/{{ server_name }}_{{ timestamp }}"
+      remote_backup_path: "{{ remote_backup_dir }}/{{ server_name }}/{{ server_name }}_{{ timestamp }}"
+
+  tasks:
+      - name: "Установка фиксированного имени файла отчета"
+        set_fact:
+            fixed_report_file: "backup_info_current.txt"
+        run_once: true
+
+      - name: "Создание заголовка отчета на backup сервере"
+        shell: |
+            ssh -i {{ backup_ssh_key }} -p {{ backup_port }} {{ backup_user }}@{{ backup_server }} "
+              mkdir -p {{ backup_log_dir }}
+              # Очищаем файл отчета в начале каждого запуска
+              echo '============================================' > {{ backup_log_dir }}/{{ fixed_report_file }}
+              echo 'BACKUP REPORT - {{ ansible_date_time.iso8601 }}' >> {{ backup_log_dir }}/{{ fixed_report_file }}
+              echo '============================================' >> {{ backup_log_dir }}/{{ fixed_report_file }}
+              echo '' >> {{ backup_log_dir }}/{{ fixed_report_file }}
+            "
+        delegate_to: localhost
+        run_once: true
+        when: inventory_hostname == groups['backups_servers'][0]
+
+      - name: "Создание локальной директории с именем сервера"
+        file:
+            path: "{{ local_backup_path }}"
+            state: directory
+            mode: "0755"
+        delegate_to: localhost
+        run_once: true
+
+      - name: "Проверка доступности файлов и директорий для бэкапа"
+        become: yes
+        stat:
+            path: "{{ item }}"
+        register: file_check
+        failed_when: not (file_check.stat.exists and (file_check.stat.isreg or file_check.stat.isdir))
+        loop: "{{ ansible_backup_files }}"
+        when: ansible_backup_files is defined and ansible_backup_files | length > 0
+
+      - name: "Создание архива файлов на удаленном сервере"
+        become: yes
+        shell: |
+            tar -czvf /tmp/backup_{{ server_name }}_{{ timestamp }}.tar.gz {{ ansible_backup_files | join(' ') }}
+        when: ansible_backup_files is defined and ansible_backup_files | length > 0
+
+      - name: "Скачивание архива на локальную машину в директорию сервера"
+        fetch:
+            src: "/tmp/backup_{{ server_name }}_{{ timestamp }}.tar.gz"
+            dest: "{{ local_backup_path }}/"
+            flat: yes
+        when: ansible_backup_files is defined and ansible_backup_files | length > 0
+
+      - name: "Удаление временного архива с удаленного сервера"
+        become: yes
+        file:
+            path: "/tmp/backup_{{ server_name }}_{{ timestamp }}.tar.gz"
+            state: absent
+        when: ansible_backup_files is defined and ansible_backup_files | length > 0
+
+      - name: "Создание директории сервера на backup сервере"
+        shell: |
+            ssh -i {{ backup_ssh_key }} -p {{ backup_port }} {{ backup_user }}@{{ backup_server }} "mkdir -p {{ remote_backup_dir }}/{{ server_name }}"
+        delegate_to: localhost
+        when: ansible_backup_files is defined and ansible_backup_files | length > 0
+
+      - name: "Отправка архива на backup сервер в директорию сервера"
+        synchronize:
+            src: "{{ local_backup_path }}/"
+            dest: "{{ backup_user }}@{{ backup_server }}:{{ remote_backup_path }}/"
+            dest_port: "{{ backup_port }}"
+            rsync_opts: "{{ rsync_options }}"
+            delete: yes
+            recursive: yes
+            _ssh_args: "-i {{ backup_ssh_key }}"
+        delegate_to: localhost
+        when: ansible_backup_files is defined and ansible_backup_files | length > 0
+
+      - name: "Удаление старых бэкапов (оставляем только последние {{ max_backups_per_server }})"
+        shell: |
+            ssh -i {{ backup_ssh_key }} -p {{ backup_port }} {{ backup_user }}@{{ backup_server }} "
+              cd {{ remote_backup_dir }}/{{ server_name }} &&
+              ls -t | tail -n +{{ max_backups_per_server + 1 }} | xargs -r rm -rf
+            "
+        delegate_to: localhost
+        when: ansible_backup_files is defined and ansible_backup_files | length > 0
+
+      - name: "Удаление локальных данных после успешной отправки"
+        file:
+            path: "{{ local_backup_path }}"
+            state: absent
+        delegate_to: localhost
+        when:
+            - cleanup_after_backup | default(true)
+            - ansible_backup_files is defined and ansible_backup_files | length > 0
+
+      - name: "Запись успешного бэкапа в отчет на backup сервере"
+        shell: |
+            ssh -i {{ backup_ssh_key }} -p {{ backup_port }} {{ backup_user }}@{{ backup_server }} "
+              echo '{{ ansible_date_time.iso8601 }} - {{ server_name }} ({{ inventory_hostname }}) - SUCCESS ✅' >> {{ backup_log_dir }}/{{ fixed_report_file }}
+            "
+        delegate_to: localhost
+        when: ansible_backup_files is defined and ansible_backup_files | length > 0
+
+      - name: "Логирование результатов бэкапа локально"
+        lineinfile:
+            path: "{{ local_backup_dir }}/ansible_backup.log"
+            line: "{{ ansible_date_time.iso8601 }} - {{ server_name }} ({{ inventory_hostname }}) - Backup completed successfully"
+            create: yes
+        delegate_to: localhost
+        when: ansible_backup_files is defined and ansible_backup_files | length > 0
+
+  handlers:
+      - name: "Запись ошибки в отчет на backup сервере"
+        shell: |
+            ssh -i {{ backup_ssh_key }} -p {{ backup_port }} {{ backup_user }}@{{ backup_server }} "
+              echo '{{ ansible_date_time.iso8601 }} - {{ server_name }} ({{ inventory_hostname }}) - ERROR ❌' >> {{ backup_log_dir }}/{{ fixed_report_file }}
+              echo 'Error details: {{ ansible_failed_result.msg | default('Unknown error') }}' >> {{ backup_log_dir }}/{{ fixed_report_file }}
+            "
+        delegate_to: localhost
+        ignore_errors: yes
+
+      - name: "Очистка при ошибке"
+        file:
+            path: "{{ local_backup_path }}"
+            state: absent
+        delegate_to: localhost
+        when: cleanup_after_backup | default(true)

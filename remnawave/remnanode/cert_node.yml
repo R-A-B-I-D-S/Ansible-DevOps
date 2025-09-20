@@ -1,0 +1,22 @@
+- name: Get Remnawave Node pubKey
+  hosts: localhost
+  gather_facts: false
+  vars:
+    remnawave_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMWMxMzAzMWQtYTg1My00NDliLTk5OWEtOTdlOWUzOTk4OGVkIiwidXNlcm5hbWUiOm51bGwsInJvbGUiOiJBUEkiLCJpYXQiOjE3NTY5ODAyMDEsImV4cCI6MTAzOTY4OTM4MDF9.6uRkmhrg6GY9ggv6q-VPB7EvkE447VGYBeIv_6yF0pY"
+    uuid: "7b29e1e8-cfdd-4104-b27e-9f99e0a1c545"
+  tasks:
+    - name: Request pubKey from Remnawave API
+      uri:
+        url: "https://remnawave.tgvpnbot.com/api/keygen/{{ uuid }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ remnawave_token }}"
+        return_content: yes
+        status_code: 200
+      register: remnawave_response
+
+    - name: Save pubKey to file
+      copy:
+        dest: "./remnawave_pubkey.pem"
+        content: "{{ remnawave_response.json.response.pubKey }}"
+      when: remnawave_response.json.response.pubKey is defined

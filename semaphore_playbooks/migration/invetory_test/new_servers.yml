@@ -1,0 +1,17 @@
+---
+all:
+    children:
+        new_servers:
+            hosts:
+                new-server-1:
+                    ansible_host: 141.105.69.38
+                    ansible_user: root
+                    ansible_port: 22
+                    ansible_password: b4z6RbHj!B
+                    server_domain: "test-vps.officialbot.org"
+                    ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+                    server_name: "server-1"
+
+    hosts:
+        localhost:
+            ansible_connection: local

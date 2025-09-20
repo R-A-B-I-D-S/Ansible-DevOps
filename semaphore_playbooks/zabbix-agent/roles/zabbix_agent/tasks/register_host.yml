@@ -1,0 +1,129 @@
+---
+- name: Check if host already exists in Zabbix
+  uri:
+    url: "{{ zabbix_api_url }}"
+    method: POST
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "host.get"
+      params:
+        filter:
+          host: "{{ server_name | default(inventory_hostname) }}"
+        output: ["hostid"]
+      auth: "{{ zabbix_auth_token }}"
+      id: 1
+    headers:
+      Content-Type: "application/json-rpc"
+  register: zabbix_host_check
+  ignore_errors: yes
+
+- name: Extract hostid if exists
+  set_fact:
+    zabbix_host_exists: "{{ (zabbix_host_check.json.result | default([])) | length > 0 }}"
+    zabbix_host_id: "{{ zabbix_host_check.json.result[0].hostid if (zabbix_host_check.json.result | default([])) | length > 0 else '' }}"
+
+- name: Get Group IDs for 'Linux servers' and 'Docker servers'
+  uri:
+    url: "{{ zabbix_api_url }}"
+    method: POST
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "hostgroup.get"
+      params:
+        filter:
+          name: "{{ item }}"
+        output: ["groupid"]
+      auth: "{{ zabbix_auth_token }}"
+      id: 1
+    headers:
+      Content-Type: "application/json-rpc"
+  loop:
+    - "Linux servers"
+    - "Docker servers"
+  register: group_results
+
+- name: Set group IDs as variables
+  set_fact:
+    linux_group_id: "{{ group_results.results[0].json.result[0].groupid }}"
+    docker_group_id: "{{ group_results.results[1].json.result[0].groupid }}"
+
+- name: Get Template IDs
+  uri:
+    url: "{{ zabbix_api_url }}"
+    method: POST
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "template.get"
+      params:
+        filter:
+          name: "{{ item }}"
+        output: ["templateid"]
+      auth: "{{ zabbix_auth_token }}"
+      id: 1
+    headers:
+      Content-Type: "application/json-rpc"
+  loop:
+    - "ICMP Ping"
+    - "Linux by Zabbix agent"
+    - "Docker by Zabbix agent 2"
+  register: template_results
+
+- name: Set template IDs as variables
+  set_fact:
+    template_ids: "{{ template_results.results | map(attribute='json.result') | map('first') | map(attribute='templateid') | list }}"
+
+- name: Create host in Zabbix if not exists
+  when: not zabbix_host_exists
+  uri:
+    url: "{{ zabbix_api_url }}"
+    method: POST
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "host.create"
+      params:
+        host: "{{ server_name | default(inventory_hostname) }}"
+        interfaces:
+          - type: 1
+            main: 1
+            useip: 1
+            ip: "{{ ansible_host }}"
+            dns: ""
+            port: "10050"
+        groups:
+          - groupid: "{{ linux_group_id }}"
+          - groupid: "{{ docker_group_id }}"
+        templates: "{{ template_ids | map('community.general.dict_kv', 'templateid') | list }}"
+      auth: "{{ zabbix_auth_token }}"
+      id: 1
+    headers:
+      Content-Type: "application/json-rpc"
+  register: create_result
+
+- name: Update host if exists (attach groups and templates)
+  when: zabbix_host_exists
+  uri:
+    url: "{{ zabbix_api_url }}"
+    method: POST
+    body_format: json
+    body:
+      jsonrpc: "2.0"
+      method: "host.update"
+      params:
+        hostid: "{{ zabbix_host_id }}"
+        groups:
+          - groupid: "{{ linux_group_id }}"
+          - groupid: "{{ docker_group_id }}"
+        templates: "{{ template_ids | map('community.general.dict_kv', 'templateid') | list }}"
+      auth: "{{ zabbix_auth_token }}"
+      id: 1
+    headers:
+      Content-Type: "application/json-rpc"
+  register: update_result
+
+- name: Show result
+  debug:
+    msg: "Host {{ server_name | default(inventory_hostname) }} (IP: {{ ansible_host }}) registered in Zabbix successfully"

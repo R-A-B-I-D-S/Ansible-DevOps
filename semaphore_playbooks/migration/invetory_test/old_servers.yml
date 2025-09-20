@@ -1,0 +1,16 @@
+---
+all:
+    children:
+        old_servers:
+            hosts:
+                old-server-1:
+                    ansible_host: 91.218.246.31
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "ansible-test.officialbot.org"
+                    ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
+                    server_name: "server-1"
+
+    hosts:
+        localhost:
+            ansible_connection: local

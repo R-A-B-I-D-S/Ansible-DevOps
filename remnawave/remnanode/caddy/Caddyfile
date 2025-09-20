@@ -1,0 +1,28 @@
+my-rebar.shop:80 {
+    redir https://{host}{uri} permanent
+}
+
+
+mos-drywall.shop:80 {
+    redir https://{host}{uri} permanent
+}
+
+
+
+mos-drywall.shop:9443 {
+    root * /var/www/mos-drywall.shop
+    file_server
+    encode gzip
+    log {
+        output file /var/log/caddy/mos-drywall.log
+    }
+}
+
+my-rebar.shop:9443 {
+    root * /var/www/my-rebar.shop
+    file_server
+    encode gzip
+    log {
+        output file /var/log/caddy/my-rebar.log
+    }
+}
