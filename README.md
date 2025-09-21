@@ -1,5 +1,5 @@
 # 🚀 OfficialVPN Ansible
-.
+
 [![License: Beerware](https://img.shields.io/badge/License-Beerware-orange.svg)](https://spdx.org/licenses/Beerware.html)
 [![Ansible](https://img.shields.io/badge/Ansible-2.17%2B-red.svg)](https://www.ansible.com/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
