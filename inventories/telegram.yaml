@@ -1,0 +1,18 @@
+---
+all:
+    children:
+        telegram_servers:
+            hosts:
+                server-1:
+                    ansible_host: 165.227.163.49
+                    ansible_user: tguser
+                    ansible_port: 11041
+                    server_domain: "tg-predprod.tgvpnbot.com"
+                    server_name: "tguser-1"
+
+                server-2:
+                    ansible_host: 142.93.161.92
+                    ansible_user: tguser
+                    ansible_port: 11041
+                    server_domain: "tg-prod.tgvpnbot.com"
+                    server_name: "tguser-2-production"

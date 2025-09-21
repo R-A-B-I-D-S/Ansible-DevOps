@@ -1,0 +1,606 @@
+---
+all:
+    children:
+        backups_servers:
+            hosts:
+                server-2:
+                    ansible_host: 85.192.48.164
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-2.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-2"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-3:
+                    ansible_host: 85.192.48.160
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-3.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-3"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-7:
+                    ansible_host: 85.192.48.155
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-7.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-7"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-8:
+                    ansible_host: 85.192.48.153
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-8.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "router-1"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-9:
+                    ansible_host: 85.192.48.147
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-9.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-9"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-10:
+                    ansible_host: 85.192.48.146
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-10.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-10"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-11:
+                    ansible_host: 85.192.48.143
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-11.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-11"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-12:
+                    ansible_host: 85.192.48.142
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-12.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-12"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-13:
+                    ansible_host: 85.192.48.141
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-13.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-13"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-14:
+                    ansible_host: 85.192.48.139
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-14.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-14"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-15:
+                    ansible_host: 85.192.48.138
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-15.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-15"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-16:
+                    ansible_host: 85.192.48.137
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-16.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-16"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-17:
+                    ansible_host: 85.192.48.136
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-17.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-17"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-18:
+                    ansible_host: 85.192.48.135
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-18.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-18"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-19:
+                    ansible_host: 85.192.48.134
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-19.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-19"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-20:
+                    ansible_host: 85.192.48.132
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-20.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-20"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-21:
+                    ansible_host: 85.192.48.128
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-21.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-21"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-22:
+                    ansible_host: 85.192.48.123
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-22.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-22"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-23:
+                    ansible_host: 85.192.48.122
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-23.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-23"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-24:
+                    ansible_host: 85.192.48.121
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-24.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-24"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-25:
+                    ansible_host: 85.192.48.118
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-25.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-25"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-26:
+                    ansible_host: 85.192.48.115
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-26.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-26"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-27:
+                    ansible_host: 85.192.48.114
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-27.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-27"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-28:
+                    ansible_host: 85.192.48.113
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-28.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-28"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-29:
+                    ansible_host: 85.192.48.112
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-29.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-29"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-30:
+                    ansible_host: 85.192.48.111
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-30.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-30"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-31:
+                    ansible_host: 85.192.48.110
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-31.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-31"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-32:
+                    ansible_host: 85.192.48.97
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-32.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-32"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-33:
+                    ansible_host: 85.192.48.96
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-33.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-33"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-34:
+                    ansible_host: 85.192.48.94
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-34.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-34"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-35:
+                    ansible_host: 85.192.48.92
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-35.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-35"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-36:
+                    ansible_host: 85.192.48.91
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-36.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-36"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-37:
+                    ansible_host: 85.192.48.89
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-37.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-37"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-38:
+                    ansible_host: 85.192.48.87
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-38.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-38"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-39:
+                    ansible_host: 85.192.48.86
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-39.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-39"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-40:
+                    ansible_host: 85.192.48.84
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-40.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-40"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-41:
+                    ansible_host: 85.192.48.83
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-41.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-41"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-42:
+                    ansible_host: 85.192.48.82
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-42.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-42"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-43:
+                    ansible_host: 85.192.48.81
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-43.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-43"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-44:
+                    ansible_host: 85.192.48.78
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-44.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-44"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-45:
+                    ansible_host: 85.192.48.75
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-45.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-45"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-46:
+                    ansible_host: 85.192.48.74
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-46.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-46"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-47:
+                    ansible_host: 85.192.48.73
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-47.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-47"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-48:
+                    ansible_host: 85.192.48.45
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-48.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-48"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-49:
+                    ansible_host: 85.192.48.44
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-49.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-49"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-50:
+                    ansible_host: 85.192.48.42
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-50.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-50"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-51:
+                    ansible_host: 85.192.48.40
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-51.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-51"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-52:
+                    ansible_host: 85.192.48.39
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-52.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-52"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-53:
+                    ansible_host: 85.192.48.37
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-53.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-53"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-54:
+                    ansible_host: 85.192.48.33
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-54.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-54"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-55:
+                    ansible_host: 85.192.48.32
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-55.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-55"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-56:
+                    ansible_host: 85.192.48.31
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-56.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-56"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-57:
+                    ansible_host: 85.192.48.29
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-57.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-57"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-58:
+                    ansible_host: 85.192.48.167
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-58.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-58"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-59:
+                    ansible_host: 85.192.48.159
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-59.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-59"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-60:
+                    ansible_host: 85.192.48.157
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-60.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "server-60"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-61:
+                    ansible_host: 85.192.48.156
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "router-2.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "router-2"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-62:
+                    ansible_host: 165.227.163.49
+                    ansible_user: tguser
+                    ansible_port: 11041
+                    server_domain: "tg-predprod.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "tguser-1"
+                    ansible_backup_files:
+                        - /home/tguser/vpn-logs/
+                        - /var/lib/docker/volumes/official-vpn-bot_db-data/_data
+
+                server-63:
+                    ansible_host: 142.93.161.92
+                    ansible_user: tguser
+                    ansible_port: 11041
+                    server_domain: "tg-prod.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
+                    server_name: "tguser-2-production"
+                    ansible_backup_files:
+                        - /home/tguser/vpn-logs/
+                        - /var/lib/docker/volumes/official-vpn-bot_db-data/_data
+
+    vars:
+        backup_server: "86.106.183.35"
+        backup_user: "backups"
+        backup_port: 11041
+        backup_ssh_key: "/etc/ansible/backups/ssh_keys/id_ed25519"
+        local_backup_dir: "/tmp/ansible_backups"
+        remote_backup_dir: "/home/backups/ansible_backups"
+        max_backups_per_server: 3
+        rsync_options: "-avz --delete --progress"

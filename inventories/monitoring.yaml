@@ -1,0 +1,16 @@
+---
+all:
+    children:
+        monitoring_servers:
+            hosts:
+                server-1:
+                    ansible_host: 193.219.97.157
+                    ansible_user: monitor
+                    ansible_port: 11041
+                    server_name: "monitoring-1 (Grafana + Prometheus)"
+
+                server-2:
+                    ansible_host: 165.227.160.47
+                    ansible_user: root
+                    ansible_port: 11041
+                    server_name: "monitoring-2 (Zabbix)"
