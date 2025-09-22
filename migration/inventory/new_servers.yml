@@ -28,7 +28,7 @@ all:
           ansible_password: zaRfij-3digdy-dirvot
           server_domain: "vpn-4.tgvpnbot.com"
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-4
-          server_name: "router-4"
+          server_name: "server-4"
 
         new-server-5:
           ansible_host: 193.24.208.193
