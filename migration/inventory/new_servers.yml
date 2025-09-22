@@ -3,41 +3,6 @@ all:
   children:
     new_servers:
       hosts:
-        new-server-1:
-          ansible_host: 193.24.208.98
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: vEWF866wZ
-          server_domain: "tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-1
-          server_name: "server-1"
-
-        new-server-3:
-          ansible_host: 193.24.208.126
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
-          server_domain: "vpn-3.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-3
-          server_name: "server-3"
-
-        new-server-4:
-          ansible_host: 193.24.208.181
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
-          server_domain: "vpn-4.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-4
-          server_name: "server-4"
-
-        new-server-5:
-          ansible_host: 193.24.208.193
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
-          server_domain: "vpn-5.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-5
-          server_name: "server-5"
 
         new-server-6:
           ansible_host: 193.24.208.194
