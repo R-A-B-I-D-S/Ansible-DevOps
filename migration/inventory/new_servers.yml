@@ -93,7 +93,50 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-10
           server_name: "server-10"
 
+        new-server-11:
+          ansible_host: 193.24.208.225
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: zaRfij-3digdy-dirvot
+          server_domain: "vpn-11.tgvpnbot.com"
+          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-11
+          server_name: "server-11"
 
+        new-server-12:
+          ansible_host: 193.24.208.227
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: zaRfij-3digdy-dirvot
+          server_domain: "vpn-12.tgvpnbot.com"
+          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-12
+          server_name: "server-12"
+
+        new-server-13:
+          ansible_host: 193.24.208.233
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: zaRfij-3digdy-dirvot
+          server_domain: "vpn-13.tgvpnbot.com"
+          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-13
+          server_name: "server-13"
+
+        new-server-14:
+          ansible_host: 193.24.208.236
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: zaRfij-3digdy-dirvot
+          server_domain: "vpn-14.tgvpnbot.com"
+          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-14
+          server_name: "server-14"
+
+        new-server-15:
+          ansible_host: 193.24.208.243
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: zaRfij-3digdy-dirvot
+          server_domain: "vpn-15.tgvpnbot.com"
+          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-15
+          server_name: "server-15"
 
   hosts:
     localhost:

@@ -83,6 +83,46 @@ all:
                     ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
                     server_name: "server-10"
 
+                server-11:
+                    ansible_host: 193.24.208.225
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-11.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
+                    server_name: "server-11"
+
+                server-12:
+                    ansible_host: 193.24.208.227
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-12.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
+                    server_name: "server-12"
+
+                server-13:
+                    ansible_host: 193.24.208.233
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-13.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
+                    server_name: "server-13"
+
+                server-14:
+                    ansible_host: 193.24.208.236
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-14.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
+                    server_name: "server-14"
+
+                server-15:
+                    ansible_host: 193.24.208.243
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-15.tgvpnbot.com"
+                    ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
+                    server_name: "server-15"
+
     hosts:
         localhost:
             ansible_connection: local
