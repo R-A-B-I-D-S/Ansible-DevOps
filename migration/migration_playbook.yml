@@ -83,7 +83,7 @@
                 Пользователь: {{ vpn_user }}
                 Пароль: {{ vpn_user_password }}
                 Дата создания: {{ ansible_date_time.iso8601 }}
-            dest: "./passwords/vpn_passwords_{{ inventory_hostname }}.txt"
+            dest: "./playbooks/passwords/vpn_passwords_{{ inventory_hostname }}.txt"
             mode: "0600"
         delegate_to: localhost
         become: no
