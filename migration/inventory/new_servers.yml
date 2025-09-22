@@ -12,15 +12,6 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-1
           server_name: "server-1"
 
-        new-server-2:
-          ansible_host: 193.24.208.118
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-2
-          server_domain: "vpn-2.tgvpnbot.com"
-          server_name: "server-2"
-
         new-server-3:
           ansible_host: 193.24.208.126
           ansible_user: root

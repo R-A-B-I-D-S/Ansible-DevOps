@@ -11,14 +11,6 @@ all:
                     ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
                     server_name: "server-1"
 
-                server-2:
-                    ansible_host: 193.24.208.118
-                    ansible_user: vpnuser
-                    ansible_port: 11041
-                    server_domain: "vpn-2.tgvpnbot.com"
-                    ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
-                    server_name: "server-2"
-
                 server-3:
                     ansible_host: 193.24.208.126
                     ansible_user: vpnuser
