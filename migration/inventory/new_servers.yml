@@ -8,7 +8,7 @@ all:
           ansible_user: root
           ansible_port: 22
           ansible_password: vEWF866wZ
-          server_domain: "vpn.tgvpnbot.com"
+          server_domain: "tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-1"
 
@@ -47,6 +47,52 @@ all:
           server_domain: "vpn-5.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-5"
+
+        new-server-6:
+          ansible_host: 193.24.208.194
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: zaRfij-3digdy-dirvot
+          server_domain: "vpn-6.tgvpnbot.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-6"
+
+        new-server-7:
+          ansible_host: 193.24.208.203
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: zaRfij-3digdy-dirvot
+          server_domain: "vpn-7.tgvpnbot.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-7"
+
+        new-server-8:
+          ansible_host: 193.24.208.206
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: zaRfij-3digdy-dirvot
+          server_domain: "vpn-8.tgvpnbot.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-8"
+
+        new-server-9:
+          ansible_host: 193.24.208.219
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: zaRfij-3digdy-dirvot
+          server_domain: "vpn-9.tgvpnbot.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-9"
+
+        new-server-10:
+          ansible_host: 193.24.208.222
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: zaRfij-3digdy-dirvot
+          server_domain: "vpn-10.tgvpnbot.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-10"
+
 
 
   hosts:
