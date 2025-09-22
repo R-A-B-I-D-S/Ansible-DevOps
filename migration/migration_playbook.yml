@@ -130,4 +130,4 @@
 - import_playbook: playbooks/06_xray_update.yml
 - import_playbook: playbooks/07_configure_3xui.yml
 - import_playbook: playbooks/08_install_monitoring.yml
-- import_playbook: playbooks/04_configure_ssh.yml
+# - import_playbook: playbooks/04_configure_ssh.yml
