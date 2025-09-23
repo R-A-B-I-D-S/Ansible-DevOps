@@ -24,7 +24,7 @@ all:
           ansible_user: vpnuser
           ansible_port: 11041
           server_domain: "vpn-4.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-4
+          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "server-4"
 
         new-server-5:
@@ -112,6 +112,46 @@ all:
           ansible_user: vpnuser
           ansible_port: 11041
           server_domain: "vpn-15.tgvpnbot.com"
+          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
+          server_name: "server-15"
+
+        new-server-16:
+          ansible_host: 85.192.48.137
+          ansible_user: vpnuser
+          ansible_port: 11041
+          server_domain: "vpn-16.tgvpnbot.com"
+          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
+          server_name: "server-16"
+
+        new-server-17:
+          ansible_host: 85.192.48.136
+          ansible_user: vpnuser
+          ansible_port: 11041
+          server_domain: "vpn-17.tgvpnbot.com"
+          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
+          server_name: "server-17"
+
+        new-server-18:
+          ansible_host: 85.192.48.135
+          ansible_user: vpnuser
+          ansible_port: 11041
+          server_domain: "vpn-18.tgvpnbot.com"
+          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
+          server_name: "server-18"
+
+        new-server-19:
+          ansible_host: 85.192.48.134
+          ansible_user: vpnuser
+          ansible_port: 11041
+          server_domain: "vpn-19.tgvpnbot.com"
+          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
+          server_name: "server-19"
+
+        new-server-61:
+          ansible_host: 85.192.48.138
+          ansible_user: vpnuser
+          ansible_port: 11041
+          server_domain: "router-2.tgvpnbot.com"
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "server-15"
 

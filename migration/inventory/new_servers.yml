@@ -1,133 +1,187 @@
 ---
 all:
   children:
-    old_servers:
+    new_servers:
       hosts:
-        old-server-1:
-          ansible_host: 193.24.208.98
+        new-server-1:
+          ansible_host: 152.53.185.117
           ansible_user: root
           ansible_port: 22
-          ansible_password: vEWF866wZ
+          ansible_password: qarZmGY5F0Snp67
           server_domain: "tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-1
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-1"
 
-        old-server-3:
-          ansible_host: 193.24.208.126
+        new-server-2:
+          ansible_host: 152.53.146.151
           ansible_user: root
           ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
+          ansible_password: qBYxS7gMtDfZ8b2
+          server_domain: "vpn-2.tgvpnbot.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-2"
+
+        new-server-3:
+          ansible_host: 152.53.150.68
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: clrFSbnldZ3ryAg
           server_domain: "vpn-3.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-3
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-3"
 
-        old-server-4:
-          ansible_host: 193.24.208.181
+        new-server-4:
+          ansible_host: 152.53.151.141
           ansible_user: root
           ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
+          ansible_password: fa5SwTEBg30V5zi
           server_domain: "vpn-4.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-4
-          server_name: "router-4"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-4"
 
-        old-server-5:
-          ansible_host: 193.24.208.193
+        new-server-5:
+          ansible_host: 152.53.182.85
           ansible_user: root
           ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
+          ansible_password: XaZvJ7vEHT34sXH
           server_domain: "vpn-5.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-5
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-5"
 
-        old-server-6:
-          ansible_host: 193.24.208.194
+        new-server-6:
+          ansible_host: 152.53.136.184
           ansible_user: root
           ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
+          ansible_password: OBkw5Og2zJIyRBv
           server_domain: "vpn-6.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-6
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-6"
 
-        old-server-7:
-          ansible_host: 193.24.208.203
+        new-server-7:
+          ansible_host: 152.53.150.13
           ansible_user: root
           ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
+          ansible_password: 1C8jULkeRI4fyrn
           server_domain: "vpn-7.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-7
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-7"
 
-        old-server-8:
-          ansible_host: 193.24.208.206
+        new-server-8:
+          ansible_host: 152.53.138.24
           ansible_user: root
           ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
+          ansible_password: 3MNP4Mz2uDZO3W1
           server_domain: "vpn-8.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-8
-          server_name: "server-8"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "router-1"
 
-        old-server-9:
-          ansible_host: 193.24.208.219
+        new-server-9:
+          ansible_host:  152.53.137.29
           ansible_user: root
           ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
+          ansible_password: y2K3eUODTIkbpd5
           server_domain: "vpn-9.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-9
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-9"
 
-        old-server-10:
-          ansible_host: 193.24.208.222
+        new-server-10:
+          ansible_host: 152.53.149.0
           ansible_user: root
           ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
+          ansible_password: J3EIUyWRvtmQEE2
           server_domain: "vpn-10.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-10
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-10"
 
-        old-server-11:
-          ansible_host: 193.24.208.225
+        new-server-11:
+          ansible_host: 152.53.144.69
           ansible_user: root
           ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
+          ansible_password: gR76tG2I4QuRdJD
           server_domain: "vpn-11.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-11
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-11"
 
-        old-server-12:
-          ansible_host: 193.24.208.227
+        new-server-12:
+          ansible_host: 152.53.149.202
           ansible_user: root
           ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
+          ansible_password: Uyd5P9NwJvzjXLf
           server_domain: "vpn-12.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-12
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-12"
 
-        old-server-13:
-          ansible_host: 193.24.208.233
+        new-server-13:
+          ansible_host: 152.53.150.145
           ansible_user: root
           ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
+          ansible_password: ac7p57Trt6KapNg
           server_domain: "vpn-13.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-13
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-13"
 
-        old-server-14:
-          ansible_host: 193.24.208.236
+        new-server-14:
+          ansible_host: 152.53.148.111
           ansible_user: root
           ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
+          ansible_password: IFwxvwuDQMCGW0d
           server_domain: "vpn-14.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-14
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-14"
 
-        old-server-15:
-          ansible_host: 193.24.208.243
+        new-server-15:
+          ansible_host: 152.53.150.191
           ansible_user: root
           ansible_port: 22
-          ansible_password: zaRfij-3digdy-dirvot
+          ansible_password: 6W1QpNhixBdVFcG
           server_domain: "vpn-15.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-15
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-15"
+
+        new-server-16:
+          ansible_host: 152.53.148.11
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: D9VYNUUzw6h9PpT
+          server_domain: "vpn-16.tgvpnbot.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-16"
+
+        new-server-17:
+          ansible_host: 152.53.150.75
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: i4eRhG8gyQ2BsRX
+          server_domain: "vpn-17.tgvpnbot.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-17"
+
+        new-server-18:
+          ansible_host: 152.53.140.103
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: Oi4QWpOvR2ZFGuW
+          server_domain: "vpn-18.tgvpnbot.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-18"
+
+        new-server-19:
+          ansible_host: 152.53.136.145
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: NLDHM63gBH0slQr
+          server_domain: "vpn-19.tgvpnbot.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-19"
+
+        new-server-61:
+          ansible_host: 152.53.148.236
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: xr2TDB3jGhk2Nw0
+          server_domain: "router-2.tgvpnbot.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "router-2"
 
   hosts:
     localhost:
