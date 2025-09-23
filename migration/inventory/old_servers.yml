@@ -1,9 +1,9 @@
 ---
 all:
   children:
-    old_servers:
+    new_servers:
       hosts:
-        old-server-1:
+        new-server-1:
           ansible_host: 85.192.48.201
           ansible_user: vpnuser
           ansible_port: 11041
@@ -11,7 +11,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "server-1"
 
-        old-server-3:
+        new-server-3:
           ansible_host: 85.192.48.160
           ansible_user: vpnuser
           ansible_port: 11041
@@ -19,15 +19,15 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "server-3"
 
-        old-server-4:
+        new-server-4:
           ansible_host: 45.144.53.198
           ansible_user: vpnuser
           ansible_port: 11041
           server_domain: "vpn-4.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
-          server_name: "router-4"
+          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-4
+          server_name: "server-4"
 
-        old-server-5:
+        new-server-5:
           ansible_host: 45.144.53.255
           ansible_user: vpnuser
           ansible_port: 11041
@@ -35,7 +35,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "server-5"
 
-        old-server-6:
+        new-server-6:
           ansible_host: 85.192.48.2
           ansible_user: vpnuser
           ansible_port: 11041
@@ -43,7 +43,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "server-6"
 
-        old-server-7:
+        new-server-7:
           ansible_host: 85.192.48.155
           ansible_user: vpnuser
           ansible_port: 11041
@@ -51,7 +51,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "server-7"
 
-        old-server-8:
+        new-server-8:
           ansible_host: 85.192.48.153
           ansible_user: vpnuser
           ansible_port: 11041
@@ -59,7 +59,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "router-1"
 
-        old-server-9:
+        new-server-9:
           ansible_host: 85.192.48.147
           ansible_user: vpnuser
           ansible_port: 11041
@@ -67,7 +67,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "server-9"
 
-        old-server-10:
+        new-server-10:
           ansible_host: 85.192.48.146
           ansible_user: vpnuser
           ansible_port: 11041
@@ -75,7 +75,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "server-10"
 
-        old-server-11:
+        new-server-11:
           ansible_host: 85.192.48.143
           ansible_user: vpnuser
           ansible_port: 11041
@@ -83,7 +83,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "server-11"
 
-        old-server-12:
+        new-server-12:
           ansible_host: 85.192.48.142
           ansible_user: vpnuser
           ansible_port: 11041
@@ -91,7 +91,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "server-12"
 
-        old-server-13:
+        new-server-13:
           ansible_host: 85.192.48.141
           ansible_user: vpnuser
           ansible_port: 11041
@@ -99,7 +99,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "server-13"
 
-        old-server-14:
+        new-server-14:
           ansible_host: 85.192.48.139
           ansible_user: vpnuser
           ansible_port: 11041
@@ -107,7 +107,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
           server_name: "server-14"
 
-        old-server-15:
+        new-server-15:
           ansible_host: 85.192.48.138
           ansible_user: vpnuser
           ansible_port: 11041

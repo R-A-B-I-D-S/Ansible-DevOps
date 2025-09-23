@@ -75,3 +75,5 @@
             name: fail2ban
             state: restarted
             enabled: yes
+
+- import_playbook: playbooks/04_configure_ssh.yml

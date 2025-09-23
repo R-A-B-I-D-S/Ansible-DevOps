@@ -1,9 +1,9 @@
 ---
 all:
   children:
-    new_servers:
+    old_servers:
       hosts:
-        new-server-1:
+        old-server-1:
           ansible_host: 193.24.208.98
           ansible_user: root
           ansible_port: 22
@@ -12,7 +12,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-1
           server_name: "server-1"
 
-        new-server-3:
+        old-server-3:
           ansible_host: 193.24.208.126
           ansible_user: root
           ansible_port: 22
@@ -21,16 +21,16 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-3
           server_name: "server-3"
 
-        new-server-4:
+        old-server-4:
           ansible_host: 193.24.208.181
           ansible_user: root
           ansible_port: 22
           ansible_password: zaRfij-3digdy-dirvot
           server_domain: "vpn-4.tgvpnbot.com"
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-4
-          server_name: "server-4"
+          server_name: "router-4"
 
-        new-server-5:
+        old-server-5:
           ansible_host: 193.24.208.193
           ansible_user: root
           ansible_port: 22
@@ -39,7 +39,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-5
           server_name: "server-5"
 
-        new-server-6:
+        old-server-6:
           ansible_host: 193.24.208.194
           ansible_user: root
           ansible_port: 22
@@ -48,7 +48,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-6
           server_name: "server-6"
 
-        new-server-7:
+        old-server-7:
           ansible_host: 193.24.208.203
           ansible_user: root
           ansible_port: 22
@@ -57,16 +57,16 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-7
           server_name: "server-7"
 
-        new-server-8:
+        old-server-8:
           ansible_host: 193.24.208.206
           ansible_user: root
           ansible_port: 22
           ansible_password: zaRfij-3digdy-dirvot
           server_domain: "vpn-8.tgvpnbot.com"
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-8
-          server_name: "router-1"
+          server_name: "server-8"
 
-        new-server-9:
+        old-server-9:
           ansible_host: 193.24.208.219
           ansible_user: root
           ansible_port: 22
@@ -75,7 +75,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-9
           server_name: "server-9"
 
-        new-server-10:
+        old-server-10:
           ansible_host: 193.24.208.222
           ansible_user: root
           ansible_port: 22
@@ -84,7 +84,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-10
           server_name: "server-10"
 
-        new-server-11:
+        old-server-11:
           ansible_host: 193.24.208.225
           ansible_user: root
           ansible_port: 22
@@ -93,7 +93,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-11
           server_name: "server-11"
 
-        new-server-12:
+        old-server-12:
           ansible_host: 193.24.208.227
           ansible_user: root
           ansible_port: 22
@@ -102,7 +102,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-12
           server_name: "server-12"
 
-        new-server-13:
+        old-server-13:
           ansible_host: 193.24.208.233
           ansible_user: root
           ansible_port: 22
@@ -111,7 +111,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-13
           server_name: "server-13"
 
-        new-server-14:
+        old-server-14:
           ansible_host: 193.24.208.236
           ansible_user: root
           ansible_port: 22
@@ -120,7 +120,7 @@ all:
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/new_ssh/server-14
           server_name: "server-14"
 
-        new-server-15:
+        old-server-15:
           ansible_host: 193.24.208.243
           ansible_user: root
           ansible_port: 22
