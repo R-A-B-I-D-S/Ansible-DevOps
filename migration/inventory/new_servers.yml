@@ -76,7 +76,7 @@ all:
           server_name: "router-1"
 
         new-server-9:
-          ansible_host:  152.53.137.29
+          ansible_host: 152.53.137.29
           ansible_user: root
           ansible_port: 22
           ansible_password: y2K3eUODTIkbpd5
