@@ -3,167 +3,86 @@ all:
   children:
     new_servers:
       hosts:
-        new-server-2:
-          ansible_host: 152.53.146.151
+        new-server-48:
+          ansible_host: 152.53.150.112
           ansible_user: root
           ansible_port: 22
-          ansible_password: qBYxS7gMtDfZ8b2
-          server_domain: "vpn-2.tgvpnbot.com"
+          ansible_password: ioa6JkGs1Yapmz6
+          server_domain: "vpn-48.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-2"
+          server_name: "server-48"
 
-        new-server-3:
-          ansible_host: 152.53.150.68
+        new-server-49:
+          ansible_host: 152.53.187.170
           ansible_user: root
           ansible_port: 22
-          ansible_password: clrFSbnldZ3ryAg
-          server_domain: "vpn-3.tgvpnbot.com"
+          ansible_password: rhii3FQ9beKRtj1
+          server_domain: "vpn-49.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-3"
+          server_name: "server-49"
 
-        new-server-4:
-          ansible_host: 152.53.151.141
+        new-server-50:
+          ansible_host: 152.53.151.113
           ansible_user: root
           ansible_port: 22
-          ansible_password: fa5SwTEBg30V5zi
-          server_domain: "vpn-4.tgvpnbot.com"
+          ansible_password: SPLJVQAvdoEVX1U
+          server_domain: "vpn-50.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-4"
+          server_name: "server-50"
 
-        new-server-5:
-          ansible_host: 152.53.182.85
+        new-server-51:
+          ansible_host: 152.53.87.113
           ansible_user: root
           ansible_port: 22
-          ansible_password: XaZvJ7vEHT34sXH
-          server_domain: "vpn-5.tgvpnbot.com"
+          ansible_password: qpi5RxgAm21Rxl0
+          server_domain: "vpn-51.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-5"
+          server_name: "server-51"
 
-        new-server-6:
-          ansible_host: 152.53.136.184
+        new-server-52:
+          ansible_host: 152.53.149.46
           ansible_user: root
           ansible_port: 22
-          ansible_password: OBkw5Og2zJIyRBv
-          server_domain: "vpn-6.tgvpnbot.com"
+          ansible_password: NW7UU9FEEUfOh5m
+          server_domain: "vpn-52.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-6"
+          server_name: "server-52"
 
-        new-server-7:
-          ansible_host: 152.53.150.13
+        new-server-53:
+          ansible_host: 152.53.140.174
           ansible_user: root
           ansible_port: 22
-          ansible_password: 1C8jULkeRI4fyrn
-          server_domain: "vpn-7.tgvpnbot.com"
+          ansible_password: 5mIyu3TPyFIHv07
+          server_domain: "vpn-53.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-7"
+          server_name: "server-53"
 
-        new-server-8:
-          ansible_host: 152.53.138.24
+        new-server-54:
+          ansible_host: 152.53.239.253
           ansible_user: root
           ansible_port: 22
-          ansible_password: 3MNP4Mz2uDZO3W1
-          server_domain: "vpn-8.tgvpnbot.com"
+          ansible_password: S3xC8FM5rQsNaZR
+          server_domain: "vpn-54.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "router-1"
+          server_name: "server-54"
 
-        new-server-9:
-          ansible_host: 152.53.137.29
+        new-server-55:
+          ansible_host: 152.53.245.52
           ansible_user: root
           ansible_port: 22
-          ansible_password: y2K3eUODTIkbpd5
-          server_domain: "vpn-9.tgvpnbot.com"
+          ansible_password: l7fwUWh5L03vXns
+          server_domain: "vpn-55.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-9"
+          server_name: "server-55"
 
-        new-server-10:
-          ansible_host: 152.53.149.0
+        new-server-56:
+          ansible_host: 152.53.252.65
           ansible_user: root
           ansible_port: 22
-          ansible_password: J3EIUyWRvtmQEE2
-          server_domain: "vpn-10.tgvpnbot.com"
+          ansible_password: JlJ5jdqIkuopWer
+          server_domain: "vpn-56.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-10"
-
-        new-server-11:
-          ansible_host: 152.53.144.69
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: gR76tG2I4QuRdJD
-          server_domain: "vpn-11.tgvpnbot.com"
-          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-11"
-
-        new-server-12:
-          ansible_host: 152.53.149.202
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: Uyd5P9NwJvzjXLf
-          server_domain: "vpn-12.tgvpnbot.com"
-          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-12"
-
-        new-server-13:
-          ansible_host: 152.53.150.145
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: ac7p57Trt6KapNg
-          server_domain: "vpn-13.tgvpnbot.com"
-          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-13"
-
-        new-server-14:
-          ansible_host: 152.53.148.111
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: IFwxvwuDQMCGW0d
-          server_domain: "vpn-14.tgvpnbot.com"
-          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-14"
-
-        new-server-15:
-          ansible_host: 152.53.150.191
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: 6W1QpNhixBdVFcG
-          server_domain: "vpn-15.tgvpnbot.com"
-          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-15"
-
-        new-server-16:
-          ansible_host: 152.53.148.11
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: D9VYNUUzw6h9PpT
-          server_domain: "vpn-16.tgvpnbot.com"
-          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-16"
-
-        new-server-17:
-          ansible_host: 152.53.150.75
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: i4eRhG8gyQ2BsRX
-          server_domain: "vpn-17.tgvpnbot.com"
-          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-17"
-
-        new-server-18:
-          ansible_host: 152.53.140.103
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: Oi4QWpOvR2ZFGuW
-          server_domain: "vpn-18.tgvpnbot.com"
-          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-18"
-
-        new-server-61:
-          ansible_host: 152.53.148.236
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: xr2TDB3jGhk2Nw0
-          server_domain: "router-2.tgvpnbot.com"
-          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "router-2"
+          server_name: "server-56"
 
   hosts:
     localhost:
