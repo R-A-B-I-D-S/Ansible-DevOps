@@ -1,7 +1,7 @@
 ---
 - hosts: old_servers
-  serial: 1
   become: yes
+  serial: 1
   vars:
       temp_db_path: "/tmp/x-ui_migration_{{ inventory_hostname }}.db"
   tasks:
@@ -12,8 +12,8 @@
             flat: yes
 
 - hosts: actual_servers
-  serial: 1
   become: yes
+  serial: 1
   vars:
       # Найти старый сервер с совпадающим доменом
       matching_old_server: >-
@@ -76,4 +76,3 @@
             state: restarted
             enabled: yes
 
-- import_playbook: playbooks/04_configure_ssh.yml

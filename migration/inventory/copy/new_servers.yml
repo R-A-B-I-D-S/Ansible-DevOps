@@ -156,6 +156,15 @@ all:
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
           server_name: "server-18"
 
+        new-server-19:
+          ansible_host: 152.53.136.145
+          ansible_user: root
+          ansible_port: 22
+          ansible_password: NLDHM63gBH0slQr
+          server_domain: "vpn-19.tgvpnbot.com"
+          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
+          server_name: "server-19"
+
         new-server-61:
           ansible_host: 152.53.148.236
           ansible_user: root

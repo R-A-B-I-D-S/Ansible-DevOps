@@ -75,19 +75,6 @@
             validate: "visudo -cf %s"
         when: vpn_user_sudo_nopasswd
 
-      - name: Записать пароль vpnuser в локальный файл
-        copy:
-            content: |
-                Сервер: {{ inventory_hostname }}
-                IP: {{ ansible_host }}
-                Пользователь: {{ vpn_user }}
-                Пароль: {{ vpn_user_password }}
-                Дата создания: {{ ansible_date_time.iso8601 }}
-            dest: "./playbooks/passwords/vpn_passwords_{{ inventory_hostname }}.txt"
-            mode: "0600"
-        delegate_to: localhost
-        become: no
-
       - name: Проверка сопоставления серверов
         assert:
             that:

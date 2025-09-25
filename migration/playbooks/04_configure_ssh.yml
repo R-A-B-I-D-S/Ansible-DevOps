@@ -1,6 +1,6 @@
 ---
 - name: Настройка SSH безопасности
-  hosts: new_servers
+  hosts: actual_servers
   serial: 1
   become: yes
   vars:

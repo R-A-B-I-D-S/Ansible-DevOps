@@ -1,0 +1,7 @@
+- hosts: new_servers
+  serial: 1
+  become: yes
+
+  tasks:
+
+- import_playbook: playbooks/08_install_monitoring.yml
