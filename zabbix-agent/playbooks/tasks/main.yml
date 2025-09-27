@@ -27,12 +27,18 @@
 
 - name: Configure Zabbix Agent 2
   template:
-    src: zabbix_agent2.conf.j2
+    src: playbooks/templates/zabbix_agent2.conf.j2
     dest: /etc/zabbix/zabbix_agent2.conf
     owner: root
     group: root
     mode: '0644'
-  notify: Restart Zabbix Agent 2
+  register: config_changed
+
+- name: Restart Zabbix Agent 2 if config changed
+  systemd:
+    name: zabbix-agent2
+    state: restarted
+  when: config_changed.changed
 
 - name: Add zabbix user to docker group
   user:
@@ -46,10 +52,6 @@
     enabled: yes
     state: started
 
-- name: Wait for Zabbix Agent to be ready
-  wait_for_connection:
-    timeout: 30
-
 - name: Register host in Zabbix Server via API
   delegate_to: localhost
   run_once: true
@@ -59,4 +61,4 @@
         zabbix_auth_token: "{{ zabbix_api_token }}"
 
     - name: Include register host task
-      include_tasks: register_host.yml
+      include_tasks: playbooks/tasks/register_host.yml

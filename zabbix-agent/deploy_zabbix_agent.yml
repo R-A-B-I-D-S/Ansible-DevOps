@@ -1,6 +1,7 @@
 ---
 - name: Deploy Zabbix Agent 2 on Ubuntu 24.04
-  hosts: new_servers
+  hosts: actual_servers
   become: yes
-  roles:
-    - zabbix_agent
+  tasks:
+    - name: Include main tasks
+      include_tasks: playbooks/tasks/main.yml
