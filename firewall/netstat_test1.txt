@@ -1,0 +1,12 @@
+test1
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:11041           0.0.0.0:*               LISTEN      415783/sshd: /usr/s 
+tcp        0      0 127.0.0.1:62789         0.0.0.0:*               LISTEN      327823/bin/xray-lin 
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      21628/systemd-resol 
+tcp6       0      0 :::65502                :::*                    LISTEN      105524/x-ui         
+tcp6       0      0 :::11041                :::*                    LISTEN      415783/sshd: /usr/s 
+tcp6       0      0 :::3296                 :::*                    LISTEN      105524/x-ui         
+tcp6       0      0 :::443                  :::*                    LISTEN      327823/bin/xray-lin 
+tcp6       0      0 :::9229                 :::*                    LISTEN      102742/node_exporte 
+udp        0      0 127.0.0.53:53           0.0.0.0:*                           21628/systemd-resol 
