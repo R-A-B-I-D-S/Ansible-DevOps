@@ -5,18 +5,18 @@ all:
         server-2:
           ansible_host: 46.101.177.225
           ansible_user: root
-          ansible_port: 11041
+          ansible_port: 22
           server_domain: graylog.tgvpnbot.com
           ansible_ssh_private_key_file: /etc/Ansible/migration/ssh_keys/id_ed25519
           server_name: server-graylog
 
         server-3:
-          ansible_host: 203.98.67.211
-          ansible_user: vpnuser
+          ansible_host: 46.102.157.173
+          ansible_user: root
           ansible_port: 11041
-          server_domain: teleport.tgvpnbot.com
+          server_domain: burn228.com
           ansible_ssh_private_key_file: /etc/Ansible/migration/ssh_keys/id_ed25519
-          server_name: server-teleport
+          server_name: server-openwrt
 
 
   hosts:

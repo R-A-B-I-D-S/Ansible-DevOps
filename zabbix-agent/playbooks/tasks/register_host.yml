@@ -86,8 +86,8 @@
           - type: 1
             main: 1
             useip: 0
-            ip: "{{ ansible_host }}"
-            dns: "{{ server_domain}}"
+            ip: ""
+            dns: "{{ server_domain | default(inventory_hostname) }}"
             port: "10050"
         groups: "{{ group_ids | map('community.general.dict_kv', 'groupid') | list }}"
         templates: "{{ template_ids | map('community.general.dict_kv', 'templateid') | list }}"
@@ -118,4 +118,4 @@
 
 - name: Show result
   debug:
-    msg: "Host {{ server_name | default(inventory_hostname) }} (IP: {{ ansible_host }}) registered in Zabbix successfully"
+    msg: "Host {{ server_name | default(inventory_hostname) }} (FQDN: {{ server_domain | default(inventory_hostname) }}) registered in Zabbix successfully"
