@@ -23,7 +23,7 @@
     zabbix_host_exists: "{{ (zabbix_host_check.json.result | default([])) | length > 0 }}"
     zabbix_host_id: "{{ zabbix_host_check.json.result[0].hostid if (zabbix_host_check.json.result | default([])) | length > 0 else '' }}"
 
-- name: Get Group IDs for 'Linux servers' and 'Docker servers'
+- name: Get Group IDs
   uri:
     url: "{{ zabbix_api_url }}"
     method: POST
@@ -39,15 +39,12 @@
       id: 1
     headers:
       Content-Type: "application/json-rpc"
-  loop:
-    - "Linux servers"
-    - "Docker servers"
+  loop: "{{ ['Linux servers'] + (['Docker servers'] if docker_installed else []) }}"
   register: group_results
 
 - name: Set group IDs as variables
   set_fact:
-    linux_group_id: "{{ group_results.results[0].json.result[0].groupid }}"
-    docker_group_id: "{{ group_results.results[1].json.result[0].groupid }}"
+    group_ids: "{{ group_results.results | map(attribute='json.result.0.groupid') | list }}"
 
 - name: Get Template IDs
   uri:
@@ -65,15 +62,14 @@
       id: 1
     headers:
       Content-Type: "application/json-rpc"
-  loop:
-    - "ICMP Ping"
-    - "Linux by Zabbix agent"
-    - "Docker by Zabbix agent 2"
+  loop: >
+    {{ ['ICMP Ping', 'Linux by Zabbix agent'] +
+       (['Docker by Zabbix agent 2'] if docker_installed else []) }}
   register: template_results
 
 - name: Set template IDs as variables
   set_fact:
-    template_ids: "{{ template_results.results | map(attribute='json.result') | map('first') | map(attribute='templateid') | list }}"
+    template_ids: "{{ template_results.results | map(attribute='json.result.0.templateid') | list }}"
 
 - name: Create host in Zabbix if not exists
   when: not zabbix_host_exists
@@ -89,13 +85,11 @@
         interfaces:
           - type: 1
             main: 1
-            useip: 1
+            useip: 0
             ip: "{{ ansible_host }}"
-            dns: ""
+            dns: "{{ server_domain}}"
             port: "10050"
-        groups:
-          - groupid: "{{ linux_group_id }}"
-          - groupid: "{{ docker_group_id }}"
+        groups: "{{ group_ids | map('community.general.dict_kv', 'groupid') | list }}"
         templates: "{{ template_ids | map('community.general.dict_kv', 'templateid') | list }}"
       auth: "{{ zabbix_auth_token }}"
       id: 1
@@ -114,9 +108,7 @@
       method: "host.update"
       params:
         hostid: "{{ zabbix_host_id }}"
-        groups:
-          - groupid: "{{ linux_group_id }}"
-          - groupid: "{{ docker_group_id }}"
+        groups: "{{ group_ids | map('community.general.dict_kv', 'groupid') | list }}"
         templates: "{{ template_ids | map('community.general.dict_kv', 'templateid') | list }}"
       auth: "{{ zabbix_auth_token }}"
       id: 1

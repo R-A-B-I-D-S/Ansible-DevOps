@@ -40,11 +40,21 @@
     state: restarted
   when: config_changed.changed
 
+- name: Check if Docker is installed
+  command: which docker
+  register: docker_check
+  ignore_errors: yes
+
+- name: Set docker_installed fact
+  set_fact:
+    docker_installed: "{{ docker_check.rc == 0 }}"
+
 - name: Add zabbix user to docker group
   user:
     name: zabbix
     groups: docker
     append: yes
+  when: docker_installed
 
 - name: Enable and start Zabbix Agent 2
   systemd:
@@ -62,3 +72,5 @@
 
     - name: Include register host task
       include_tasks: playbooks/tasks/register_host.yml
+      vars:
+        docker_installed: "{{ docker_installed }}"
