@@ -3,86 +3,51 @@ all:
   children:
     new_servers:
       hosts:
-        new-server-48:
-          ansible_host: 152.53.150.112
+        new-server-20:
+          ansible_host: 152.53.153.74
           ansible_user: root
           ansible_port: 22
-          ansible_password: ioa6JkGs1Yapmz6
-          server_domain: "vpn-48.tgvpnbot.com"
+          ansible_password: xItl11unREZldge
+          server_domain: "vpn-20.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-48"
+          server_name: "server-20"
 
-        new-server-49:
-          ansible_host: 152.53.187.170
+        new-server-21:
+          ansible_host: 152.53.152.244
           ansible_user: root
           ansible_port: 22
-          ansible_password: rhii3FQ9beKRtj1
-          server_domain: "vpn-49.tgvpnbot.com"
+          ansible_password: ZZ82xOHaJzJV8TA
+          server_domain: "vpn-21.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-49"
+          server_name: "server-21"
 
-        new-server-50:
-          ansible_host: 152.53.151.113
+        new-server-22:
+          ansible_host: 152.53.155.168
           ansible_user: root
           ansible_port: 22
-          ansible_password: SPLJVQAvdoEVX1U
-          server_domain: "vpn-50.tgvpnbot.com"
+          ansible_password: 6gs8f1fXIJ5vZph
+          server_domain: "vpn-22.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-50"
+          server_name: "server-22"
 
-        new-server-51:
-          ansible_host: 152.53.87.113
+        new-server-23:
+          ansible_host: 152.53.153.152
           ansible_user: root
           ansible_port: 22
-          ansible_password: qpi5RxgAm21Rxl0
-          server_domain: "vpn-51.tgvpnbot.com"
+          ansible_password: NpBumTLj5Gmnuag
+          server_domain: "vpn-23.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-51"
+          server_name: "server-23"
 
-        new-server-52:
-          ansible_host: 152.53.149.46
+        new-server-24:
+          ansible_host: 152.53.152.195
           ansible_user: root
           ansible_port: 22
-          ansible_password: NW7UU9FEEUfOh5m
-          server_domain: "vpn-52.tgvpnbot.com"
+          ansible_password: 2Uau6gdqdVv8Azd
+          server_domain: "vpn-24.tgvpnbot.com"
           ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-52"
+          server_name: "server-24"
 
-        new-server-53:
-          ansible_host: 152.53.140.174
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: 5mIyu3TPyFIHv07
-          server_domain: "vpn-53.tgvpnbot.com"
-          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-53"
-
-        new-server-54:
-          ansible_host: 152.53.239.253
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: S3xC8FM5rQsNaZR
-          server_domain: "vpn-54.tgvpnbot.com"
-          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-54"
-
-        new-server-55:
-          ansible_host: 152.53.245.52
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: l7fwUWh5L03vXns
-          server_domain: "vpn-55.tgvpnbot.com"
-          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-55"
-
-        new-server-56:
-          ansible_host: 152.53.252.65
-          ansible_user: root
-          ansible_port: 22
-          ansible_password: JlJ5jdqIkuopWer
-          server_domain: "vpn-56.tgvpnbot.com"
-          ansible_ssh_common_args: "-o PasswordAuthentication=yes -o PubkeyAuthentication=no"
-          server_name: "server-56"
 
   hosts:
     localhost:

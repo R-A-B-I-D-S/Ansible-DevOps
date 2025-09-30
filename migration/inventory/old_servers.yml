@@ -3,77 +3,45 @@ all:
   children:
     old_servers:
       hosts:
-        old-server-48:
-          ansible_host: 85.192.48.45
+        old-server-20:
+          ansible_host: 85.192.48.132
           ansible_user: vpnuser
           ansible_port: 11041
-          server_domain: "vpn-48.tgvpnbot.com"
+          server_domain: "vpn-20.tgvpnbot.com"
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
-          server_name: "server-48"
+          server_name: "server-20"
 
-        old-server-49:
-          ansible_host: 85.192.48.44
+        old-server-21:
+          ansible_host: 85.192.48.128
           ansible_user: vpnuser
           ansible_port: 11041
-          server_domain: "vpn-49.tgvpnbot.com"
+          server_domain: "vpn-21.tgvpnbot.com"
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
-          server_name: "server-49"
+          server_name: "server-21"
 
-        old-server-50:
-          ansible_host: 85.192.48.42
+        old-server-22:
+          ansible_host: 85.192.48.123
           ansible_user: vpnuser
           ansible_port: 11041
-          server_domain: "vpn-50.tgvpnbot.com"
+          server_domain: "vpn-22.tgvpnbot.com"
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
-          server_name: "server-50"
+          server_name: "server-22"
 
-        old-server-51:
-          ansible_host: 85.192.48.40
+        old-server-23:
+          ansible_host: 85.192.48.122
           ansible_user: vpnuser
           ansible_port: 11041
-          server_domain: "vpn-51.tgvpnbot.com"
+          server_domain: "vpn-23.tgvpnbot.com"
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
-          server_name: "server-51"
+          server_name: "server-23"
 
-        old-server-52:
-          ansible_host: 85.192.48.39
+        old-server-24:
+          ansible_host: 85.192.48.121
           ansible_user: vpnuser
           ansible_port: 11041
-          server_domain: "vpn-52.tgvpnbot.com"
+          server_domain: "vpn-24.tgvpnbot.com"
           ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
-          server_name: "server-52"
-
-        old-server-53:
-          ansible_host: 85.192.48.37
-          ansible_user: vpnuser
-          ansible_port: 11041
-          server_domain: "vpn-53.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
-          server_name: "server-53"
-
-        old-server-54:
-          ansible_host: 85.192.48.33
-          ansible_user: vpnuser
-          ansible_port: 11041
-          server_domain: "vpn-54.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
-          server_name: "server-54"
-
-        old-server-55:
-          ansible_host: 85.192.48.32
-          ansible_user: vpnuser
-          ansible_port: 11041
-          server_domain: "vpn-55.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
-          server_name: "server-55"
-
-        old-server-56:
-          ansible_host: 85.192.48.31
-          ansible_user: vpnuser
-          ansible_port: 11041
-          server_domain: "vpn-56.tgvpnbot.com"
-          ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
-          server_name: "server-56"
+          server_name: "server-24"
 
   hosts:
     localhost:
