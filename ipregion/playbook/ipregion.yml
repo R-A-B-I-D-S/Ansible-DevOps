@@ -46,10 +46,11 @@
   gather_facts: yes
   vars:
     ipregion_output_dir: "/etc/ipregion"
+    timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
   tasks:
     - name: Создать директории для каждого сервера
       file:
-        path: "{{ ipregion_output_dir }}/{{ item }}/"
+        path: "{{ ipregion_output_dir }}/{{ hostvars[item]['server_name'] }}/"
         state: directory
         mode: '0755'
       loop: "{{ groups['servers'] }}"
@@ -58,23 +59,30 @@
     - name: Скопировать ipregion.json с каждого сервера
       fetch:
         src: /tmp/ipregion.json
-        dest: "{{ ipregion_output_dir }}/{{ item }}/ipregion-{{ item }}-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}.json"
+        dest: "{{ ipregion_output_dir }}/{{ hostvars[item]['server_name'] }}/ipregion-{{ hostvars[item]['server_name'] }}-{{ timestamp }}.json"
         flat: yes
       loop: "{{ groups['servers'] }}"
       delegate_to: "{{ item }}"
 
     - name: Найти все файлы ipregion для каждого сервера
       find:
-        paths: "{{ ipregion_output_dir }}/{{ item }}/"
-        patterns: "ipregion-{{ item }}-*.json"
+        paths: "{{ ipregion_output_dir }}/{{ hostvars[item]['server_name'] }}/"
+        patterns: "ipregion-{{ hostvars[item]['server_name'] }}-*.json"
       register: server_files
       loop: "{{ groups['servers'] }}"
       delegate_to: localhost
 
-    - name: Оставить только последние 3 файла для каждого сервера
-      file:
-        path: "{{ item.path }}"
-        state: absent
-      loop: "{{ (server_files.results | map(attribute='files') | flatten | sort(attribute='mtime', reverse=true))[3:] }}"
-      when: server_files.results | map(attribute='files') | flatten | length > 3
+    - name: Переименовать файлы с нумерацией для каждого сервера
+      shell: |
+        cd "{{ ipregion_output_dir }}/{{ hostvars[item]['server_name'] }}/"
+        counter=1
+        for file in $(ls -t ipregion-{{ hostvars[item]['server_name'] }}-*.json); do
+          if [ $counter -le 3 ]; then
+            mv "$file" "${counter}-{{ hostvars[item]['server_name'] }}-${file#ipregion-{{ hostvars[item]['server_name'] }}-}"
+            counter=$((counter + 1))
+          else
+            rm -f "$file"
+          fi
+        done
+      loop: "{{ groups['servers'] }}"
       delegate_to: localhost
