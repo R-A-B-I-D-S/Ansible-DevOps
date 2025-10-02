@@ -38,7 +38,7 @@
         mode: '0644'
 
 - name: Скачиваем json с серверов на ansible-управляющий сервер
-  hosts: teleport
+  hosts: all
   tasks:
     - name: Скопировать ipregion.json в директорию на ansible-хосте
       fetch:
