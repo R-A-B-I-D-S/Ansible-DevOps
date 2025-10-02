@@ -1,4 +1,5 @@
 - name: Деплой и запуск ipregion.sh
+  serial: 10
   hosts: all
   become: yes
   vars:
@@ -19,6 +20,7 @@
       when: not ipregion_exists.stat.exists
 
     - name: Установить зависимости для (bash, curl, jq)
+      serial: 10
       package:
         name:
           - bash
@@ -27,17 +29,20 @@
         state: present
 
     - name: Запустить скрипт ipregion.sh с выводом в json
+      serial: 10
       command: "{{ ipregion_script_path }} --json"
       register: ipregion_json
       changed_when: false
 
     - name: Сохранить вывод в файл на сервере
+      serial: 10
       copy:
         content: "{{ ipregion_json.stdout }}"
         dest: "{{ ipregion_json_path }}"
         mode: '0644'
 
 - name: Скачиваем json с серверов на ansible-управляющий сервер
+  serial: 10
   hosts: localhost
   gather_facts: yes
   vars:
@@ -52,6 +57,7 @@
       delegate_to: localhost
 
     - name: Скопировать ipregion.json с каждого сервера
+      serial: 10
       fetch:
         src: /tmp/ipregion.json
         dest: "{{ ipregion_output_dir }}/{{ item }}/ipregion-{{ item }}-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}.json"
