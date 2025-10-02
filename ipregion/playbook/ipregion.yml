@@ -1,6 +1,8 @@
 - name: Деплой и запуск ipregion.sh
   hosts: all
   become: yes
+  strategy: free
+  serial: 10
   vars:
     ipregion_script_url: "https://raw.githubusercontent.com/Davoyan/ipregion/main/ipregion.sh"
     ipregion_script_path: "/usr/local/bin/ipregion.sh"
@@ -30,6 +32,8 @@
       command: "{{ ipregion_script_path }} --json"
       register: ipregion_json
       changed_when: false
+      async: 300
+      poll: 10
 
     - name: Сохранить вывод в файл на сервере
       copy:
@@ -40,10 +44,12 @@
 - name: Скачиваем json с серверов на ansible-управляющий сервер
   hosts: localhost
   gather_facts: yes
+  vars:
+    ipregion_output_dir: "./ipregion_data"
   tasks:
     - name: Создать директории для каждого сервера
       file:
-        path: "/etc/ipregion/{{ item }}/"
+        path: "{{ ipregion_output_dir }}/{{ item }}/"
         state: directory
         mode: '0755'
       loop: "{{ groups['servers'] }}"
@@ -52,14 +58,14 @@
     - name: Скопировать ipregion.json с каждого сервера
       fetch:
         src: /tmp/ipregion.json
-        dest: "/etc/ipregion/{{ item }}/ipregion-{{ item }}-{{ ansible_date_time.date }}.json"
+        dest: "{{ ipregion_output_dir }}/{{ item }}/ipregion-{{ item }}-{{ ansible_date_time.date }}.json"
         flat: yes
       loop: "{{ groups['servers'] }}"
       delegate_to: "{{ item }}"
 
     - name: Найти все файлы ipregion для каждого сервера
       find:
-        paths: "/etc/ipregion/{{ item }}/"
+        paths: "{{ ipregion_output_dir }}/{{ item }}/"
         patterns: "ipregion-{{ item }}-*.json"
       register: server_files
       loop: "{{ groups['servers'] }}"
