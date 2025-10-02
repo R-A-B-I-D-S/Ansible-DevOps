@@ -56,3 +56,19 @@
         flat: yes
       loop: "{{ groups['servers'] }}"
       delegate_to: "{{ item }}"
+
+    - name: Найти все файлы ipregion для каждого сервера
+      find:
+        paths: "/etc/ipregion/{{ item }}/"
+        patterns: "ipregion-{{ item }}-*.json"
+      register: server_files
+      loop: "{{ groups['servers'] }}"
+      delegate_to: localhost
+
+    - name: Оставить только последние 3 файла для каждого сервера
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ server_files.results | map(attribute='files') | flatten | sort(attribute='mtime', reverse=true) | list[3:] }}"
+      when: server_files.results | map(attribute='files') | flatten | length > 3
+      delegate_to: localhost
