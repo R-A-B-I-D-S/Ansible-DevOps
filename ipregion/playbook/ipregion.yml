@@ -76,20 +76,28 @@
       shell: |
         cd "{{ ipregion_output_dir }}/{{ hostvars[item]['server_name'] }}/"
         
-        # Удалить все старые файлы с нумерацией
-        rm -f [0-9]-{{ hostvars[item]['server_name'] }}-*.json
+        # Создать временную директорию для сортировки
+        mkdir -p temp_sort
         
-        # Переименовать новые файлы с нумерацией
+        # Переместить все файлы (старые с нумерацией и новые) во временную директорию
+        mv [0-9]-{{ hostvars[item]['server_name'] }}-*.json temp_sort/ 2>/dev/null || true
+        mv ipregion-{{ hostvars[item]['server_name'] }}-*.json temp_sort/ 2>/dev/null || true
+        
+        # Переименовать все файлы с нумерацией, оставив только 3 самых новых
         counter=1
-        for file in $(ls -t ipregion-{{ hostvars[item]['server_name'] }}-*.json); do
+        for file in $(ls -t temp_sort/*.json); do
           if [ $counter -le 3 ]; then
             # Извлекаем только дату и время из имени файла
-            timestamp=$(echo "$file" | sed "s/ipregion-{{ hostvars[item]['server_name'] }}-//" | sed "s/\.json$//")
+            filename=$(basename "$file")
+            timestamp=$(echo "$filename" | sed "s/^[0-9]-{{ hostvars[item]['server_name'] }}-//" | sed "s/^ipregion-{{ hostvars[item]['server_name'] }}-//" | sed "s/\.json$//")
             mv "$file" "${counter}-{{ hostvars[item]['server_name'] }}-${timestamp}.json"
             counter=$((counter + 1))
           else
             rm -f "$file"
           fi
         done
+        
+        # Удалить временную директорию
+        rmdir temp_sort 2>/dev/null || true
       loop: "{{ groups['servers'] }}"
       delegate_to: localhost
