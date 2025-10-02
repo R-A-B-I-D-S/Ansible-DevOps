@@ -69,6 +69,6 @@
       file:
         path: "{{ item.path }}"
         state: absent
-      loop: "{{ server_files.results | map(attribute='files') | flatten | sort(attribute='mtime', reverse=true) | list[3:] }}"
+      loop: "{{ (server_files.results | map(attribute='files') | flatten | sort(attribute='mtime', reverse=true))[3:] }}"
       when: server_files.results | map(attribute='files') | flatten | length > 3
       delegate_to: localhost
