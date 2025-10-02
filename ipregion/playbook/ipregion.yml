@@ -75,10 +75,17 @@
     - name: Переименовать файлы с нумерацией для каждого сервера
       shell: |
         cd "{{ ipregion_output_dir }}/{{ hostvars[item]['server_name'] }}/"
+        
+        # Удалить все старые файлы с нумерацией
+        rm -f [0-9]-{{ hostvars[item]['server_name'] }}-*.json
+        
+        # Переименовать новые файлы с нумерацией
         counter=1
         for file in $(ls -t ipregion-{{ hostvars[item]['server_name'] }}-*.json); do
           if [ $counter -le 3 ]; then
-            mv "$file" "${counter}-{{ hostvars[item]['server_name'] }}-${file#ipregion-{{ hostvars[item]['server_name'] }}-}"
+            # Извлекаем только дату и время из имени файла
+            timestamp=$(echo "$file" | sed "s/ipregion-{{ hostvars[item]['server_name'] }}-//" | sed "s/\.json$//")
+            mv "$file" "${counter}-{{ hostvars[item]['server_name'] }}-${timestamp}.json"
             counter=$((counter + 1))
           else
             rm -f "$file"
