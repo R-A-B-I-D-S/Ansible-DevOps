@@ -81,31 +81,24 @@
         delegate_to: localhost
         when: ansible_backup_files is defined and ansible_backup_files | length > 0
 
-      - name: "Перемещение архива в финальную директорию"
-        copy:
+      - name: "Отправка архива на backup сервер"
+        synchronize:
             src: "{{ local_backup_path }}/backup_{{ server_name }}_{{ timestamp }}.tar.gz"
-            dest: "{{ remote_backup_path }}/backup_{{ server_name }}_{{ timestamp }}.tar.gz"
-            mode: "0644"
+            dest: "{{ backup_user | default('backups') }}@{{ backup_server | default('86.106.183.35') }}:{{ remote_backup_dir | default('/home/backups/ansible_backups') }}/{{ server_name }}/"
+            dest_port: "{{ backup_port | default(11041) }}"
+            rsync_opts: "{{ rsync_options | default('-avz --progress') }}"
+            delete: no
         delegate_to: localhost
         when: ansible_backup_files is defined and ansible_backup_files | length > 0
 
-      - name: "Удаление старых бэкапов (оставляем только последние {{ max_backups_per_server | default(3) }})"
-        find:
-            paths: "{{ backup_output_dir | default('./backup_data') }}/{{ server_name }}"
-            patterns: "backup_{{ server_name }}_*.tar.gz"
-        register: old_backups
+      - name: "Удаление старых бэкапов на backup сервере"
+        shell: |
+            ssh -p {{ backup_port | default(11041) }} {{ backup_user | default('backups') }}@{{ backup_server | default('86.106.183.35') }} "
+              cd {{ remote_backup_dir | default('/home/backups/ansible_backups') }}/{{ server_name }} &&
+              ls -t backup_{{ server_name }}_*.tar.gz | tail -n +{{ (max_backups_per_server | default(3)) + 1 }} | xargs -r rm -f
+            "
         delegate_to: localhost
         when: ansible_backup_files is defined and ansible_backup_files | length > 0
-
-      - name: "Удаление старых файлов бэкапов"
-        file:
-            path: "{{ item.path }}"
-            state: absent
-        loop: "{{ (old_backups.files | sort(attribute='mtime', reverse=true))[max_backups_per_server | default(3):] }}"
-        delegate_to: localhost
-        when: 
-            - ansible_backup_files is defined and ansible_backup_files | length > 0
-            - old_backups.files | length > (max_backups_per_server | default(3))
 
       - name: "Удаление локальных данных после успешной отправки"
         file:
