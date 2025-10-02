@@ -4,14 +4,40 @@ all:
         backups_servers:
             hosts:
                 server-2:
-                    ansible_host: 206.189.58.13
-                    ansible_user: root
+                    ansible_host: 152.53.146.151
+                    ansible_user: vpnuser
                     ansible_port: 11041
-                    server_domain: "ansible.officialbot.org"
-                    ansible_ssh_private_key_file: /etc/ansible/backups/ssh_keys/id_ed25519
-                    server_name: "server-ansible"
+                    server_domain: "vpn-2.tgvpnbot.com"
+                    server_name: "server-2"
                     ansible_backup_files:
-                        - /root/.config/semaphore/config.json
+                        - /etc/x-ui/x-ui.db
+
+                server-3:
+                    ansible_host: 152.53.150.68
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-3.tgvpnbot.com"
+                    server_name: "server-3"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-4:
+                    ansible_host: 152.53.151.141
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-4.tgvpnbot.com"
+                    server_name: "server-4"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
+
+                server-5:
+                    ansible_host: 152.53.182.85
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-5.tgvpnbot.com"
+                    server_name: "server-5"
+                    ansible_backup_files:
+                        - /etc/x-ui/x-ui.db
 
     vars:
         backup_server: "86.106.183.35"
