@@ -19,7 +19,7 @@ all:
                     server_domain: "vpn-3.tgvpnbot.com"
                     server_name: "server-3"
                     ansible_backup_files:
-                        - /etc/x-ui/x-ui.db
+                        - /etc/x-ui/x-ui.hz
 
                 server-4:
                     ansible_host: 152.53.151.141
