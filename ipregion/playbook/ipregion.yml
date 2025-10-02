@@ -54,7 +54,7 @@
     - name: Скопировать ipregion.json с каждого сервера
       fetch:
         src: /tmp/ipregion.json
-        dest: "{{ ipregion_output_dir }}/{{ item }}/ipregion-{{ item }}-{{ ansible_date_time.date }}.json"
+        dest: "{{ ipregion_output_dir }}/{{ item }}/ipregion-{{ item }}-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}.json"
         flat: yes
       loop: "{{ groups['servers'] }}"
       delegate_to: "{{ item }}"
