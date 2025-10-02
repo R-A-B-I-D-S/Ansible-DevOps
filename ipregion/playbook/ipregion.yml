@@ -26,6 +26,9 @@
           - bash
           - curl
           - jq
+          - bsdextrautils
+          - bsdmainutils
+          - ncal
         state: present
 
     - name: Запустить скрипт ipregion.sh с выводом в json
