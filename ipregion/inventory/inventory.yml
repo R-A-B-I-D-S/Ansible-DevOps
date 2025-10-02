@@ -3,10 +3,10 @@ all:
     children:
         servers:
             hosts:
-                server-2:
-                    ansible_host: 206.189.58.13
-                    ansible_user: root
+                server-1:
+                    ansible_host: 86.106.183.35
+                    ansible_user: backups
                     ansible_port: 11041
-                    server_domain: "ansible.officialbot.org"
-                    server_name: "server-ansible"
+                    server_name: "backups"
+
 
