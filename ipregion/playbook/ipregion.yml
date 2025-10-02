@@ -38,10 +38,21 @@
         mode: '0644'
 
 - name: Скачиваем json с серверов на ansible-управляющий сервер
-  hosts: all
+  hosts: localhost
+  gather_facts: yes
   tasks:
-    - name: Скопировать ipregion.json в директорию на ansible-хосте
+    - name: Создать директории для каждого сервера
+      file:
+        path: "/etc/ipregion/{{ item }}/"
+        state: directory
+        mode: '0755'
+      loop: "{{ groups['servers'] }}"
+      delegate_to: localhost
+
+    - name: Скопировать ipregion.json с каждого сервера
       fetch:
         src: /tmp/ipregion.json
-        dest: /etc/ipregion/"{{ inventory_hostname }}"/
+        dest: "/etc/ipregion/{{ item }}/ipregion-{{ item }}-{{ ansible_date_time.date }}.json"
         flat: yes
+      loop: "{{ groups['servers'] }}"
+      delegate_to: "{{ item }}"
