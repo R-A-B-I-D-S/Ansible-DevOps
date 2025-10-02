@@ -4,37 +4,10 @@
   gather_facts: yes
   vars:
       timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
-      backup_report_file: "backup_info_{{ ansible_date_time.iso8601_basic_short }}.txt"
-      backup_log_dir: "{{ backup_output_dir | default('./backup_logs') }}/backups_log"
       local_backup_path: "{{ backup_output_dir | default('./backup_data') }}/{{ server_name }}_{{ timestamp }}"
       remote_backup_path: "{{ backup_output_dir | default('./backup_data') }}/{{ server_name }}/{{ server_name }}_{{ timestamp }}"
 
   tasks:
-      - name: "Установка фиксированного имени файла отчета"
-        set_fact:
-            fixed_report_file: "backup_info_current.txt"
-        run_once: true
-
-      - name: "Создание заголовка отчета локально"
-        file:
-            path: "{{ backup_log_dir }}"
-            state: directory
-            mode: "0755"
-        delegate_to: localhost
-        run_once: true
-
-      - name: "Создание файла отчета"
-        copy:
-            content: |
-                ============================================
-                BACKUP REPORT - {{ ansible_date_time.iso8601 }}
-                ============================================
-                
-            dest: "{{ backup_log_dir }}/{{ fixed_report_file }}"
-            mode: "0644"
-        delegate_to: localhost
-        run_once: true
-        when: inventory_hostname == groups['backups_servers'][0]
 
       - name: "Создание локальной директории с именем сервера"
         file:
@@ -56,12 +29,12 @@
       - name: "Создание архива файлов на удаленном сервере"
         become: yes
         shell: |
-            tar -czvf /tmp/backup_{{ server_name }}_{{ timestamp }}.tar.gz {{ ansible_backup_files | join(' ') }}
+            tar -czvf /tmp/backup_{{ inventory_hostname }}_{{ timestamp }}.tar.gz {{ ansible_backup_files | join(' ') }}
         when: ansible_backup_files is defined and ansible_backup_files | length > 0
 
       - name: "Скачивание архива на локальную машину в директорию сервера"
         fetch:
-            src: "/tmp/backup_{{ server_name }}_{{ timestamp }}.tar.gz"
+            src: "/tmp/backup_{{ inventory_hostname }}_{{ timestamp }}.tar.gz"
             dest: "{{ local_backup_path }}/"
             flat: yes
         when: ansible_backup_files is defined and ansible_backup_files | length > 0
@@ -69,7 +42,7 @@
       - name: "Удаление временного архива с удаленного сервера"
         become: yes
         file:
-            path: "/tmp/backup_{{ server_name }}_{{ timestamp }}.tar.gz"
+            path: "/tmp/backup_{{ inventory_hostname }}_{{ timestamp }}.tar.gz"
             state: absent
         when: ansible_backup_files is defined and ansible_backup_files | length > 0
 
@@ -83,7 +56,7 @@
 
       - name: "Отправка архива на backup сервер"
         synchronize:
-            src: "{{ local_backup_path }}/backup_{{ server_name }}_{{ timestamp }}.tar.gz"
+            src: "{{ local_backup_path }}/backup_{{ inventory_hostname }}_{{ timestamp }}.tar.gz"
             dest: "{{ backup_user | default('backups') }}@{{ backup_server | default('86.106.183.35') }}:{{ remote_backup_dir | default('/home/backups/ansible_backups') }}/{{ server_name }}/"
             dest_port: "{{ backup_port | default(11041) }}"
             rsync_opts: "{{ rsync_options | default('-avz --progress') }}"
@@ -95,7 +68,7 @@
         shell: |
             ssh -p {{ backup_port | default(11041) }} {{ backup_user | default('backups') }}@{{ backup_server | default('86.106.183.35') }} "
               cd {{ remote_backup_dir | default('/home/backups/ansible_backups') }}/{{ server_name }} &&
-              ls -t backup_{{ server_name }}_*.tar.gz | tail -n +{{ (max_backups_per_server | default(3)) + 1 }} | xargs -r rm -f
+              ls -t backup_{{ inventory_hostname }}_*.tar.gz | tail -n +{{ (max_backups_per_server | default(3)) + 1 }} | xargs -r rm -f
             "
         delegate_to: localhost
         when: ansible_backup_files is defined and ansible_backup_files | length > 0
@@ -109,14 +82,6 @@
             - cleanup_after_backup | default(true)
             - ansible_backup_files is defined and ansible_backup_files | length > 0
 
-      - name: "Запись успешного бэкапа в отчет"
-        lineinfile:
-            path: "{{ backup_log_dir }}/{{ fixed_report_file }}"
-            line: "{{ ansible_date_time.iso8601 }} - {{ server_name }} ({{ inventory_hostname }}) - SUCCESS ✅"
-            create: yes
-        delegate_to: localhost
-        when: ansible_backup_files is defined and ansible_backup_files | length > 0
-
       - name: "Логирование результатов бэкапа локально"
         lineinfile:
             path: "{{ backup_output_dir | default('./backup_data') }}/ansible_backup.log"
@@ -126,14 +91,6 @@
         when: ansible_backup_files is defined and ansible_backup_files | length > 0
 
   handlers:
-      - name: "Запись ошибки в отчет"
-        lineinfile:
-            path: "{{ backup_log_dir }}/{{ fixed_report_file }}"
-            line: "{{ ansible_date_time.iso8601 }} - {{ server_name }} ({{ inventory_hostname }}) - ERROR ❌ - {{ ansible_failed_result.msg | default('Unknown error') }}"
-            create: yes
-        delegate_to: localhost
-        ignore_errors: yes
-
       - name: "Очистка при ошибке"
         file:
             path: "{{ local_backup_path }}"
