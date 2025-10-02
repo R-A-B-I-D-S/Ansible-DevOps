@@ -6,7 +6,7 @@ all:
                 server-20:
                     ansible_host: 152.53.153.74
                     ansible_user: vpnuser
-                    ansible_port: 11041
+                    ansible_port: 22
                     server_domain: "vpn-20.tgvpnbot.com"
                     ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
                     server_name: "server-20"
@@ -14,7 +14,7 @@ all:
                 server-21:
                     ansible_host: 152.53.152.244
                     ansible_user: vpnuser
-                    ansible_port: 11041
+                    ansible_port: 22
                     server_domain: "vpn-21.tgvpnbot.com"
                     ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
                     server_name: "server-21"
@@ -22,7 +22,7 @@ all:
                 server-22:
                     ansible_host: 152.53.155.168
                     ansible_user: vpnuser
-                    ansible_port: 11041
+                    ansible_port: 22
                     server_domain: "vpn-22.tgvpnbot.com"
                     ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
                     server_name: "server-22"
@@ -30,7 +30,7 @@ all:
                 server-23:
                     ansible_host: 152.53.153.152
                     ansible_user: vpnuser
-                    ansible_port: 11041
+                    ansible_port: 22
                     server_domain: "vpn-23.tgvpnbot.com"
                     ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
                     server_name: "server-23"
@@ -38,7 +38,7 @@ all:
                 server-24:
                     ansible_host: 152.53.152.195
                     ansible_user: vpnuser
-                    ansible_port: 11041
+                    ansible_port: 22
                     server_domain: "vpn-24.tgvpnbot.com"
                     ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
                     server_name: "server-24"

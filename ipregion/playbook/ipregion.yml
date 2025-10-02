@@ -1,0 +1,47 @@
+- name: Деплой и запуск ipregion.sh
+  hosts: all
+  become: yes
+  vars:
+    ipregion_script_url: "https://raw.githubusercontent.com/Davoyan/ipregion/main/ipregion.sh"
+    ipregion_script_path: "/usr/local/bin/ipregion.sh"
+    ipregion_json_path: "/tmp/ipregion.json"
+  tasks:
+    - name: Проверить, есть ли уже ipregion.sh
+      stat:
+        path: "{{ ipregion_script_path }}"
+      register: ipregion_exists
+
+    - name: Скачать ipregion.sh, если его нет
+      get_url:
+        url: "{{ ipregion_script_url }}"
+        dest: "{{ ipregion_script_path }}"
+        mode: '0755'
+      when: not ipregion_exists.stat.exists
+
+    - name: Установить зависимости для (bash, curl, jq)
+      package:
+        name:
+          - bash
+          - curl
+          - jq
+        state: present
+
+    - name: Запустить скрипт ipregion.sh с выводом в json
+      command: "{{ ipregion_script_path }} --json"
+      register: ipregion_json
+      changed_when: false
+
+    - name: Сохранить вывод в файл на сервере
+      copy:
+        content: "{{ ipregion_json.stdout }}"
+        dest: "{{ ipregion_json_path }}"
+        mode: '0644'
+
+- name: Скачиваем json с серверов на ansible-управляющий сервер
+  hosts: teleport
+  tasks:
+    - name: Скопировать ipregion.json в директорию на ansible-хосте
+      fetch:
+        src: /tmp/ipregion.json
+        dest: /etc/ansible/ipregion/{{ inventory_hostname }}/
+        flat: yes
