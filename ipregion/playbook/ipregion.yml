@@ -43,5 +43,5 @@
     - name: Скопировать ipregion.json в директорию на ansible-хосте
       fetch:
         src: /tmp/ipregion.json
-        dest: /etc/ansible/ipregion/{{ inventory_hostname }}/
+        dest: /etc/ipregion/{{ inventory_hostname }}/
         flat: yes
