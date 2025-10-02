@@ -41,7 +41,7 @@
   hosts: localhost
   gather_facts: yes
   vars:
-    ipregion_output_dir: "./ipregion_data"
+    ipregion_output_dir: "/etc/ipregion"
   tasks:
     - name: Создать директории для каждого сервера
       file:
