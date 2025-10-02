@@ -2,7 +2,6 @@
   hosts: all
   become: yes
   serial: 10
-  strategy: free
   vars:
     ipregion_script_url: "https://raw.githubusercontent.com/Davoyan/ipregion/main/ipregion.sh"
     ipregion_script_path: "/usr/local/bin/ipregion.sh"
