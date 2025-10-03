@@ -101,3 +101,5 @@
         rmdir temp_sort 2>/dev/null || true
       loop: "{{ groups['servers'] }}"
       delegate_to: localhost
+
+- import_playbook: ./ipregion_analyzer.yml
