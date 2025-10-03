@@ -33,6 +33,13 @@ all:
                     ansible_port: 11041
                     server_name: "server-5"
 
+                server-18:
+                    ansible_host: 152.53.140.103
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_name: "server-18"
+
+
 
 
 
