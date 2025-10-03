@@ -6,7 +6,7 @@
   
   tasks:
     - name: Запуск ipregion_analyzer.py
-      command: python3 /usr/local/bin/ipregion_analyzer/ipregion_analyzer.py
+      shell: python3 /usr/local/bin/ipregion_analyzer/ipregion_analyzer.py
       register: analyzer_result
       
     - name: Показать результат выполнения
