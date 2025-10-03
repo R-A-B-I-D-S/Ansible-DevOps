@@ -1,5 +1,6 @@
 ---
 - name: Запуск анализатора покрытия Германии
+  hosts: localhost
   gather_facts: no
   
   tasks:
