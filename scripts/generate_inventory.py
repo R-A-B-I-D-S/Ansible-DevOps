@@ -100,6 +100,8 @@ def generate_inventory(start_num: int, end_num: int,
                 f.write(f"                    ansible_port: {server_data['ansible_port']}\n")
                 f.write(f"                    server_domain: \"{server_data['server_domain']}\"\n")
                 f.write(f"                    server_name: \"{server_data['server_name']}\"\n")
+                f.write(f"                    ansible_backup_files:\n")
+                f.write(f"                        - /etc/x-ui/x-ui.db\n")
                 
                 # Добавляем пустую строку между серверами (кроме последнего)
                 if i < len(server_hosts) - 1:

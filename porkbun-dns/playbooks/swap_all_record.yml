@@ -2,8 +2,6 @@
   hosts: localhost
   connection: local
   gather_facts: no
-  vars_files:
-    - ../porkbun.yml
 
   tasks:
     - name: Получить списки старых и новых серверов
