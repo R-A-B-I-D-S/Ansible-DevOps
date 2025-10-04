@@ -48,3 +48,6 @@ all:
         remote_backup_dir: "/home/backups/ansible_backups"
         max_backups_per_server: 3
         rsync_options: "-avz --delete --progress"
+        telegram_notifications: true
+        telegram_bot_token: "8214816868:AAGefRYKW3BsJKB9996XF3IBdp2fWxt0Jmc"
+        telegram_chat_id: "-1003095232306"
