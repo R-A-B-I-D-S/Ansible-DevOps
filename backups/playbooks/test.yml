@@ -1,0 +1,30 @@
+---
+- name: Test download Zabbix repo package
+  hosts: all
+  become: yes
+  tasks:
+    - name: Set Zabbix repo URL based on OS
+      set_fact:
+        zabbix_repo_url: >-
+          {% if ansible_facts['os_family'] == 'Debian' and ansible_facts['distribution'] | lower == 'ubuntu' %}
+            https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_7.0+ubuntu22.04_all.deb
+          {% elif ansible_facts['os_family'] == 'Debian' and ansible_facts['distribution'] | lower == 'debian' %}
+            https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/zabbix-release_latest_7.0+debian12_all.deb
+          {% else %}
+            ""
+          {% endif %}
+
+    - name: Fail if OS is not supported
+      fail:
+        msg: "This playbook supports only Debian and Ubuntu!"
+      when: zabbix_repo_url == ""
+
+    - name: Show which OS and repo URL will be used
+      debug:
+        msg: "Detected OS: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }} → Repo: {{ zabbix_repo_url }}"
+
+    - name: Download Zabbix repository package to /home/vpnuser
+      get_url:
+        url: "{{ zabbix_repo_url }}"
+        dest: /home/vpnuser/zabbix-release.deb
+        mode: '0644'
