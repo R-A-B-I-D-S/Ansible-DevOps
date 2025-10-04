@@ -4,6 +4,6 @@
 
   tasks:
     - name: Удалить пакеты
-      shell: apt purge zabbix-release zabbix-agent2 zabbix-agent2-plugin-mongodb zabbix-agent2-plugin-mssql zabbix-agent2-plugin-postgresql
+      shell: apt purge zabbix-release zabbix-agent2 zabbix-agent2-plugin-mongodb zabbix-agent2-plugin-mssql zabbix-agent2-plugin-postgresql -y
       
   
