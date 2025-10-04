@@ -1,6 +1,6 @@
 ---
 - name: Test download Zabbix repo package
-  hosts: all
+  hosts: backups_servers
   become: yes
   tasks:
     - name: Set Zabbix repo URL based on OS
