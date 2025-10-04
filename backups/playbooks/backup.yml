@@ -83,10 +83,6 @@
             - cleanup_after_backup | default(true)
             - ansible_backup_files is defined and ansible_backup_files | length > 0
 
-      - name: "Отправка уведомлений в Telegram"
-        import_playbook: telegram_notifications.yml
-        when: telegram_notifications | default(true)
-
   handlers:
       - name: "Очистка при ошибке"
         file:
@@ -94,3 +90,5 @@
             state: absent
         delegate_to: localhost
         when: cleanup_after_backup | default(true)
+
+- import_playbook: ./telegram_notifications.yml

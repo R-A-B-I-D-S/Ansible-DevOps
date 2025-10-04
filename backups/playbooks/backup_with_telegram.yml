@@ -1,0 +1,7 @@
+---
+- name: "Rsync Backup Infrastructure with Telegram Notifications"
+  import_playbook: backup.yml
+
+- name: "Telegram Notifications"
+  import_playbook: telegram_notifications.yml
+  when: telegram_notifications | default(true)
