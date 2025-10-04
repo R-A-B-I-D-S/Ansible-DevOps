@@ -10,6 +10,412 @@ all:
                     server_domain: "vpn-2.tgvpnbot.com"
                     server_name: "server-2"
 
+                server-3:
+                    ansible_host: 152.53.150.68
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-3.tgvpnbot.com"
+                    server_name: "server-3"
+
+                server-4:
+                    ansible_host: 152.53.151.141
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-4.tgvpnbot.com"
+                    server_name: "server-4"
+
+                server-5:
+                    ansible_host: 152.53.182.85
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-5.tgvpnbot.com"
+                    server_name: "server-5"
+
+                server-6:
+                    ansible_host: 152.53.136.184
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-6.tgvpnbot.com"
+                    server_name: "server-6"
+
+                server-7:
+                    ansible_host: 152.53.150.13
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-7.tgvpnbot.com"
+                    server_name: "server-7"
+
+                server-8:
+                    ansible_host: 152.53.138.24
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-8.tgvpnbot.com"
+                    server_name: "router-1"
+
+                server-9:
+                    ansible_host: 152.53.137.29
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-9.tgvpnbot.com"
+                    server_name: "server-9"
+
+                server-10:
+                    ansible_host: 152.53.149.0
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-10.tgvpnbot.com"
+                    server_name: "server-10"
+
+                server-11:
+                    ansible_host: 152.53.144.69
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-11.tgvpnbot.com"
+                    server_name: "server-11"
+
+                server-12:
+                    ansible_host: 152.53.149.202
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-12.tgvpnbot.com"
+                    server_name: "server-12"
+
+                server-13:
+                    ansible_host: 152.53.150.145
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-13.tgvpnbot.com"
+                    server_name: "server-13"
+
+                server-14:
+                    ansible_host: 152.53.148.111
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-14.tgvpnbot.com"
+                    server_name: "server-14"
+
+                server-15:
+                    ansible_host: 152.53.150.191
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-15.tgvpnbot.com"
+                    server_name: "server-15"
+
+                server-16:
+                    ansible_host: 152.53.148.11
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-16.tgvpnbot.com"
+                    server_name: "server-16"
+
+                server-17:
+                    ansible_host: 152.53.150.75
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-17.tgvpnbot.com"
+                    server_name: "server-17"
+
+                server-18:
+                    ansible_host: 152.53.140.103
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-18.tgvpnbot.com"
+                    server_name: "server-18"
+
+                server-19:
+                    ansible_host: 152.53.136.145
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-19.tgvpnbot.com"
+                    server_name: "server-19"
+
+                server-20:
+                    ansible_host: 152.53.153.74
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-20.tgvpnbot.com"
+                    server_name: "server-20"
+
+                server-21:
+                    ansible_host: 152.53.152.244
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-21.tgvpnbot.com"
+                    server_name: "server-21"
+
+                server-22:
+                    ansible_host: 152.53.155.168
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-22.tgvpnbot.com"
+                    server_name: "server-22"
+
+                server-23:
+                    ansible_host: 152.53.153.152
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-23.tgvpnbot.com"
+                    server_name: "server-23"
+
+                server-24:
+                    ansible_host: 152.53.152.195
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-24.tgvpnbot.com"
+                    server_name: "server-24"
+
+                server-25:
+                    ansible_host: 85.192.48.118
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-25.tgvpnbot.com"
+                    server_name: "server-25"
+
+                server-26:
+                    ansible_host: 85.192.48.115
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-26.tgvpnbot.com"
+                    server_name: "server-26"
+
+                server-27:
+                    ansible_host: 85.192.48.114
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-27.tgvpnbot.com"
+                    server_name: "server-27"
+
+                server-28:
+                    ansible_host: 85.192.48.113
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-28.tgvpnbot.com"
+                    server_name: "server-28"
+
+                server-29:
+                    ansible_host: 85.192.48.112
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-29.tgvpnbot.com"
+                    server_name: "server-29"
+
+                server-30:
+                    ansible_host: 85.192.48.111
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-30.tgvpnbot.com"
+                    server_name: "server-30"
+
+                server-31:
+                    ansible_host: 152.53.151.144
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-31.tgvpnbot.com"
+                    server_name: "server-31"
+
+                server-32:
+                    ansible_host: 85.192.48.97
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-32.tgvpnbot.com"
+                    server_name: "server-32"
+
+                server-33:
+                    ansible_host: 85.192.48.96
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-33.tgvpnbot.com"
+                    server_name: "server-33"
+
+                server-34:
+                    ansible_host: 85.192.48.94
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-34.tgvpnbot.com"
+                    server_name: "server-34"
+
+                server-35:
+                    ansible_host: 85.192.48.92
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-35.tgvpnbot.com"
+                    server_name: "server-35"
+
+                server-36:
+                    ansible_host: 85.192.48.91
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-36.tgvpnbot.com"
+                    server_name: "server-36"
+
+                server-37:
+                    ansible_host: 85.192.48.89
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-37.tgvpnbot.com"
+                    server_name: "server-37"
+
+                server-38:
+                    ansible_host: 85.192.48.87
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-38.tgvpnbot.com"
+                    server_name: "server-38"
+
+                server-39:
+                    ansible_host: 85.192.48.86
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-39.tgvpnbot.com"
+                    server_name: "server-39"
+
+                server-40:
+                    ansible_host: 85.192.48.84
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-40.tgvpnbot.com"
+                    server_name: "server-40"
+
+                server-41:
+                    ansible_host: 85.192.48.83
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-41.tgvpnbot.com"
+                    server_name: "server-41"
+
+                server-42:
+                    ansible_host: 85.192.48.82
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-42.tgvpnbot.com"
+                    server_name: "server-42"
+
+                server-43:
+                    ansible_host: 85.192.48.81
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-43.tgvpnbot.com"
+                    server_name: "server-43"
+
+                server-44:
+                    ansible_host: 85.192.48.78
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-44.tgvpnbot.com"
+                    server_name: "server-44"
+
+                server-45:
+                    ansible_host: 85.192.48.75
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-45.tgvpnbot.com"
+                    server_name: "server-45"
+
+                server-46:
+                    ansible_host: 85.192.48.74
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-46.tgvpnbot.com"
+                    server_name: "server-46"
+
+                server-47:
+                    ansible_host: 85.192.48.73
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-47.tgvpnbot.com"
+                    server_name: "server-47"
+
+                server-48:
+                    ansible_host: 152.53.150.112
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-48.tgvpnbot.com"
+                    server_name: "server-48"
+
+                server-49:
+                    ansible_host: 152.53.187.170
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-49.tgvpnbot.com"
+                    server_name: "server-49"
+
+                server-50:
+                    ansible_host: 152.53.151.113
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-50.tgvpnbot.com"
+                    server_name: "server-50"
+
+                server-51:
+                    ansible_host: 152.53.87.113
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-51.tgvpnbot.com"
+                    server_name: "server-51"
+
+                server-52:
+                    ansible_host: 152.53.149.46
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-52.tgvpnbot.com"
+                    server_name: "server-52"
+
+                server-53:
+                    ansible_host: 152.53.140.174
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-53.tgvpnbot.com"
+                    server_name: "server-53"
+
+                server-54:
+                    ansible_host: 152.53.239.253
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-54.tgvpnbot.com"
+                    server_name: "server-54"
+
+                server-55:
+                    ansible_host: 152.53.245.52
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-55.tgvpnbot.com"
+                    server_name: "server-55"
+
+                server-56:
+                    ansible_host: 152.53.252.65
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-56.tgvpnbot.com"
+                    server_name: "server-56"
+
+                server-57:
+                    ansible_host: 152.53.148.148
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-57.tgvpnbot.com"
+                    server_name: "server-57"
+
+                server-58:
+                    ansible_host: 85.192.48.167
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-58.tgvpnbot.com"
+                    server_name: "server-58"
+
+                server-59:
+                    ansible_host: 85.192.48.159
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-59.tgvpnbot.com"
+                    server_name: "server-59"
+
+                server-60:
+                    ansible_host: 85.192.48.157
+                    ansible_user: vpnuser
+                    ansible_port: 11041
+                    server_domain: "vpn-60.tgvpnbot.com"
+                    server_name: "server-60"
+
 
     hosts:
         localhost:
