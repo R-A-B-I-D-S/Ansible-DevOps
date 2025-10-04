@@ -1,0 +1,91 @@
+---
+- name: "Telegram Notifications for Backup"
+  hosts: localhost
+  gather_facts: no
+  vars:
+      telegram_bot_token: "{{ telegram_bot_token | default('YOUR_BOT_TOKEN') }}"
+      telegram_chat_id: "{{ telegram_chat_id | default('YOUR_CHAT_ID') }}"
+      telegram_topic_id: "{{ telegram_topic_id | default('') }}"
+
+  tasks:
+      - name: "Сбор статистики по серверам"
+        set_fact:
+            backup_stats:
+                total_servers: "{{ ansible_play_hosts | length }}"
+                successful_servers: "{{ ansible_play_hosts | selectattr('ansible_failed', 'undefined') | list | length }}"
+                failed_servers: "{{ ansible_play_hosts | selectattr('ansible_failed', 'defined') | list | length }}"
+                servers_list: "{{ ansible_play_hosts }}"
+
+      - name: "Определение общего статуса"
+        set_fact:
+            overall_status: "{{ 'success' if backup_stats.failed_servers == 0 else 'failed' }}"
+
+      - name: "Формирование списка серверов для сообщения"
+        set_fact:
+            servers_message: |
+                {%- for host in backup_stats.servers_list -%}
+                {%- if host.ansible_failed is defined -%}
+                ❌ {{ host.inventory_hostname }} ({{ host.ansible_host }})
+                {%- else -%}
+                ✅ {{ host.inventory_hostname }} ({{ host.ansible_host }})
+                {%- endif -%}
+                {%- if not loop.last %}
+                {%- endif -%}
+                {%- endfor -%}
+
+      - name: "Формирование сообщения для Telegram"
+        set_fact:
+            telegram_message: |
+                {%- if overall_status == 'success' -%}
+                🤖 <b>BACKUP REPORT - УСПЕШНО</b>
+                {%- else -%}
+                🤖 <b>BACKUP REPORT - С ОШИБКАМИ</b>
+                {%- endif %}
+                
+                🕐 <b>Время:</b> {{ ansible_date_time.iso8601 }}
+                📊 <b>Статистика:</b> {{ backup_stats.successful_servers }}/{{ backup_stats.total_servers }} серверов
+                ⏱️ <b>Длительность:</b> {{ ansible_date_time.epoch | int - playbook_start_time | default(ansible_date_time.epoch) | int }}s
+                
+                <b>📋 Детали по серверам:</b>
+                {{ servers_message }}
+                
+                {%- if backup_stats.failed_servers > 0 %}
+                
+                <b>🚨 Ошибки:</b>
+                {%- for host in backup_stats.servers_list -%}
+                {%- if host.ansible_failed is defined %}
+                • {{ host.inventory_hostname }}: {{ host.ansible_failed | default('Неизвестная ошибка') }}
+                {%- endif -%}
+                {%- endfor %}
+                {%- endif %}
+                
+                <i>🤖 Ansible Backup Bot</i>
+
+      - name: "Отправка уведомления в Telegram"
+        uri:
+            url: "https://api.telegram.org/bot{{ telegram_bot_token }}/sendMessage"
+            method: POST
+            body_format: json
+            body:
+                chat_id: "{{ telegram_chat_id }}"
+                text: "{{ telegram_message }}"
+                parse_mode: "HTML"
+                disable_web_page_preview: true
+                {%- if telegram_topic_id and telegram_topic_id != '' %}
+                message_thread_id: "{{ telegram_topic_id }}"
+                {%- endif %}
+            status_code: 200
+        register: telegram_result
+        failed_when: false
+
+      - name: "Проверка результата отправки"
+        debug:
+            msg: "{{ 'Уведомление отправлено успешно' if telegram_result.status == 200 else 'Ошибка отправки уведомления: ' + telegram_result.msg | default('Неизвестная ошибка') }}"
+
+      - name: "Логирование результата"
+        lineinfile:
+            path: "{{ backup_output_dir | default('./backup_data') }}/telegram_notifications.log"
+            line: "{{ ansible_date_time.iso8601 }} - {{ 'SUCCESS' if telegram_result.status == 200 else 'FAILED' }} - {{ backup_stats.successful_servers }}/{{ backup_stats.total_servers }} серверов"
+            create: yes
+        delegate_to: localhost
+        when: telegram_logging | default(true)
