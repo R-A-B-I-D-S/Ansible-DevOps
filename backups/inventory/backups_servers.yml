@@ -4,7 +4,7 @@ all:
         backups_servers:
             hosts:
                 server-2:
-                    ansible_host: 152.53.146.151
+                    ansible_host: 85.192.48.118
                     ansible_user: vpnuser
                     ansible_port: 11041
                     server_domain: "vpn-2.tgvpnbot.com"
