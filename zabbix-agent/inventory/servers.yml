@@ -11,11 +11,11 @@ all:
                     server_name: "server-2"
 
                 server-3:
-                    ansible_host: 152.53.150.68
-                    ansible_user: vpnuser
+                    ansible_host: 206.189.58.13
+                    ansible_user: root
                     ansible_port: 11041
-                    server_domain: "vpn-3.tgvpnbot.com"
-                    server_name: "server-3"
+                    server_domain: "ansible.officialbot.org"
+                    server_name: "ansible"
 
     hosts:
         localhost:
