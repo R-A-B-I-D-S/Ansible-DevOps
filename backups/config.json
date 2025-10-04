@@ -1,0 +1,5 @@
+{
+  "telegram_bot_token": "TOKEN",
+  "telegram_chat_id": "YOUR_CHAT_ID_HERE",
+  "telegram_topic_id": null
+}
