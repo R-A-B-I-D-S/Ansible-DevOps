@@ -1,5 +1,5 @@
 - name: Удаление агентов zabbix
-  hosts: all
+  hosts: actual_servers
   become: yes
 
   tasks:
