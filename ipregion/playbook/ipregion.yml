@@ -26,6 +26,7 @@
           - bsdextrautils
           - bsdmainutils
           - ncal
+          - dnsutils
         state: present
 
     - name: Запустить скрипт ipregion.sh с выводом в json
