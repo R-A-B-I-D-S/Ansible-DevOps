@@ -6,17 +6,16 @@
     ipregion_script_path: "/usr/local/bin/ipregion.sh"
     ipregion_json_path: "/tmp/ipregion.json"
   tasks:
-    - name: Проверить, есть ли уже ipregion.sh
-      stat:
+    - name: Удалить старый ipregion.sh
+      file:
         path: "{{ ipregion_script_path }}"
-      register: ipregion_exists
-
-    - name: Скачать ipregion.sh, если его нет
+        state: absent
+    
+    - name: Скачать ipregion.sh
       get_url:
         url: "{{ ipregion_script_url }}"
         dest: "{{ ipregion_script_path }}"
         mode: '0755'
-      when: not ipregion_exists.stat.exists
 
     - name: Установить зависимости для (bash, curl, jq)
       package:
