@@ -1,5 +1,5 @@
 - name: Деплой и запуск ipregion.sh
-  hosts: Infrastructure
+  hosts: 3X-UI
   become: yes
   vars:
     ipregion_script_url: "https://raw.githubusercontent.com/Official-VPN/Telegraph-Images/refs/heads/main/ipregion.sh"
