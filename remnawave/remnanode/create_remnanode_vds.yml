@@ -1,5 +1,5 @@
 - name: Установка и запуск remnanode через Docker Compose
-  hosts: all
+  hosts: servers
   become: yes
   vars:
     remnanode_dir: /opt/remnanode
@@ -15,7 +15,7 @@
       file:
         path: "{{ remnanode_dir }}"
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Создать .env для remnanode
       copy:
@@ -52,12 +52,8 @@
       async: 60
       poll: 0
 
-
-
-
 - import_playbook: create_remnanode.yml
 - import_playbook: playbooks/prepare_system.yml
 - import_playbook: playbooks/create_user.yml
 - import_playbook: playbooks/install_fail2ban.yml
-- import_playbook: playbooks/configure_ssh.yml  
-
+- import_playbook: playbooks/configure_ssh.yml

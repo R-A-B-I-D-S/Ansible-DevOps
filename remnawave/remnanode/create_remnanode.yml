@@ -1,5 +1,5 @@
 - name: Создать новую ноду через RemnaWave API
-  hosts: all
+  hosts: servers
   gather_facts: no
   tasks:
     - name: Создать ноду через RemnaWave API
