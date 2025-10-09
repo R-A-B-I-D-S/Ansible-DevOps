@@ -41,7 +41,7 @@
         mode: "0644"
 
 - name: Скачиваем json с серверов на ansible-управляющий сервер
-  hosts: localhost
+#  hosts: localhost
   gather_facts: yes
   vars:
     ipregion_output_dir: "/etc/ipregion"
