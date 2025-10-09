@@ -1,6 +1,6 @@
 ---
 - name: Deploy Caddy with two websites
-  hosts: all
+  hosts: servers
   become: yes
   vars:
     base_dir: "/etc/ansible/remnawave/remnanode"
