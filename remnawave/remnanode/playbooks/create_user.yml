@@ -31,12 +31,6 @@
         owner: "{{ vpn_user }}"
         group: "{{ vpn_user }}"
 
-    - name: Добавить SSH ключ для vpnuser
-      authorized_key:
-        user: "{{ vpn_user }}"
-        key: "{{ lookup('file', '/etc/ansible/migration/ssh_keys/id_ed25519.pub') }}"
-        state: present
-
     - name: Настроить sudo без пароля для vpnuser
       lineinfile:
         path: /etc/sudoers
@@ -44,16 +38,3 @@
         state: present
         validate: "visudo -cf %s"
       when: vpn_user_sudo_nopasswd
-
-    - name: Записать пароль vpnuser в локальный файл
-      copy:
-        content: |
-          Сервер: {{ inventory_hostname }}
-          IP: {{ ansible_host }}
-          Пользователь: {{ vpn_user }}
-          Пароль: {{ vpn_user_password }}
-          Дата создания: {{ ansible_date_time.iso8601 }}
-        dest: "/etc/ansible/remnawave/remnanode/password/vpn_passwords_{{ inventory_hostname }}.txt"
-        mode: "0600"
-      delegate_to: localhost
-      become: no
