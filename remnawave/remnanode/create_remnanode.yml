@@ -18,7 +18,7 @@
             "trafficLimitBytes": 0,
             "notifyPercent": 0,
             "trafficResetDay": 1,
-            "countryCode": "{{ country }}",
+            "countryCode": "{{ location }}",
             "consumptionMultiplier": 0.1,
             "configProfile": {
               "activeConfigProfileUuid": "ac37f74d-7df2-42f6-a67f-36bc02cc81e3",
