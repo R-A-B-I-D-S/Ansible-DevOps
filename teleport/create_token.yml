@@ -1,0 +1,23 @@
+- name: Generate Teleport join token
+  hosts: localhost
+  become: true
+  gather_facts: false
+  tasks:
+#    - name: Teleport tsh login
+#      shell: tsh login --proxy={{ teleport_proxy }} --user={{ teleport_user }} --auth=local --password={{ teleport_password }}
+#      register: tsh_login_result
+#      ignore_errors: yes  # Можно убрать, если хотите строгое поведение
+#      no_log: true        # Не выводить пароль в логе
+
+    - name: Generate join token for node
+      command: tctl tokens add --type=node --ttl=1h
+      register: token_result
+
+    - name: Set fact with join token
+      set_fact:
+        teleport_join_token: "{{ token_result.stdout | regex_search('The invite token: ([a-zA-Z0-9]+)', '\\1') }}"
+
+    - name: Show join token
+      debug:
+       var: teleport_join_token
+   

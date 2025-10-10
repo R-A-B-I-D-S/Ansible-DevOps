@@ -1,0 +1,84 @@
+- hosts: all
+  become: true
+  vars_files:
+    - group_vars/all.yml
+
+  tasks:
+    - name: Скачать архив Teleport 17.7.7
+      get_url:
+        url: "https://cdn.teleport.dev/teleport-v17.7.7-linux-amd64-bin.tar.gz"
+        dest: "/tmp/teleport-v17.7.7-linux-amd64-bin.tar.gz"
+        mode: '0644'
+
+    - name: Распаковать архив Teleport 17.7.7
+      unarchive:
+        src: "/tmp/teleport-v17.7.7-linux-amd64-bin.tar.gz"
+        dest: "/tmp/"
+        remote_src: yes
+
+    - name: Переместить бинарник teleport в /usr/bin/
+      copy:
+        src: "/tmp/teleport/teleport"
+        dest: "/usr/bin/teleport"
+        mode: '0755'
+        owner: root
+        group: root
+        remote_src: yes
+
+    - name: Deploy teleport.yaml (with proper nodename and label)
+      template:
+        src: teleport.yaml.j2
+        dest: /etc/teleport.yaml
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Ensure teleport.service.d directory exists
+      file:
+        path: /etc/systemd/system/teleport.service.d
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Create *основной systemd unit-файл* teleport
+      copy:
+        dest: /etc/systemd/system/teleport.service
+        content: |
+          [Unit]
+          Description=Teleport SSH Service
+          After=network.target
+
+          [Service]
+          ExecStart=/usr/bin/teleport start --config=/etc/teleport.yaml
+          Restart=always
+          LimitNOFILE=1048576
+
+          [Install]
+          WantedBy=multi-user.target
+        owner: root
+        group: root
+        mode: 0644
+      notify: Reload systemd
+
+    - name: Create Teleport systemd unit override (if required)
+      copy:
+        dest: /etc/systemd/system/teleport.service.d/override.conf
+        content: |
+          [Service]
+          ExecStart=
+          ExecStart=/usr/bin/teleport start --config=/etc/teleport.yaml --token={{ teleport_token }} --auth-server={{ teleport_auth_server }}
+        owner: root
+        group: root
+        mode: 0644
+      notify: Reload systemd
+
+    - name: Enable and restart Teleport service
+      systemd:
+        name: teleport
+        state: restarted
+        enabled: yes
+
+  handlers:
+    - name: Reload systemd
+      command: systemctl daemon-reload
