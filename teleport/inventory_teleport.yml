@@ -2,10 +2,10 @@ all:
     children:
         actual_servers:
             hosts:
-                test-node4:
+                test-node5:
                     ansible_host: 85.192.48.110
                     ansible_user: root
                     ansible_port: 11041
                     ansible_ssh_private_key_file: /etc/ansible/migration/ssh_keys/id_ed25519
                     ansible_password: 4344343
-                    server_name: "test-node7"
+                    server_name: "test-node8"
