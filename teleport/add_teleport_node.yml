@@ -1,7 +1,7 @@
 - hosts: all
   become: true
   vars_files:
-    - group_vars/all.yml
+    config_teleport_path: "./teleport.yaml.j2"
 
   tasks:
     - name: Скачать архив Teleport 17.7.7
@@ -27,7 +27,7 @@
 
     - name: Deploy teleport.yaml (with proper nodename and label)
       template:
-        src: teleport.yaml.j2
+        src: "{{ config_teleport_path }}"
         dest: /etc/teleport.yaml
         owner: root
         group: root
