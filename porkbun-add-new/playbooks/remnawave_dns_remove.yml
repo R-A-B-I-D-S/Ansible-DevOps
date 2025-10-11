@@ -41,7 +41,7 @@
     # --- ШАГ 2: Получить DNS-записи для домена ---
     - name: 🔍 Получить DNS-записи домена
       uri:
-        url: "https://api.porkbun.com/api/json/v3/dns/retrieve/  {{ item }}"
+        url: "https://api.porkbun.com/api/json/v3/dns/retrieve/{{ item }}"
         method: POST
         body:
           apikey: "{{ porkbun_api_key }}"
@@ -94,7 +94,7 @@
     # --- ШАГ 4: Удалить A-записи неактивных нод ---
     - name: 🗑️ Удалить A-записи неактивных нод через Porkbun
       uri:
-        url: "https://api.porkbun.com/api/json/v3/dns/delete/  {{ item.0.name }}/{{ item.1.id }}"
+        url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ item.0.name }}/{{ item.1.id }}"
         method: POST
         body:
           apikey: "{{ porkbun_api_key }}"
