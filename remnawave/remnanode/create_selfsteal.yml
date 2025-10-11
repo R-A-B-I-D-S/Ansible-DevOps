@@ -40,6 +40,24 @@
         dest: "{{ working_dir }}/Caddyfile"
         mode: '0644'
 
+    # ⚠️ Очистка каталога с данными Caddy
+    - name: Stop existing Caddy containers (if any)
+      shell: docker compose down
+      args:
+        chdir: "{{ working_dir }}"
+      ignore_errors: yes
+
+    - name: Clean old Caddy data (certificates, cache, etc.)
+      file:
+        path: "{{ working_dir }}/data"
+        state: absent
+
+    - name: Recreate empty Caddy data directory
+      file:
+        path: "{{ working_dir }}/data"
+        state: directory
+        mode: '0755'
+
     # 4) Копирование файлов сайтов из локальных папок
     - name: Copy mos-drywall.shop website files
       copy:
