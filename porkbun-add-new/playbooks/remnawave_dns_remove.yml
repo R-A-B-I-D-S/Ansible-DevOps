@@ -1,4 +1,4 @@
----
+ ---
 - name: 🗑️ Удалить A-записи для неактивных нод Remnawave из DNS Porkbun
   hosts: localhost
   gather_facts: no
@@ -85,7 +85,7 @@
             (
               (dns_retrieve_results.results | selectattr('item', 'equalto', item) | first).json.records
               | selectattr('type', 'equalto', 'A')
-              | selectattr('name', 'in', ['@', item])
+              | selectattr('name', 'in', ['@', item.split('.')[0]])
               | list
             )
           }}
@@ -101,22 +101,7 @@
           {{
             orphaned_records | default({}) | combine({
               domain: (
-                existing_a_records_map[domain] | default([])
-              )
-            })
-          }}
-      loop: "{{ target_domains }}"
-      loop_control:
-        loop_var: domain
-
-    # Фильтрация лишних записей (те, что не соответствуют активным IP)
-    - name: 🧩 Отфильтровать лишние записи
-      set_fact:
-        orphaned_records: >-
-          {{
-            orphaned_records | default({}) | combine({
-              domain: (
-                existing_a_records_map[domain] | default([])
+                (existing_a_records_map[domain] | default([]))
                 | selectattr(0, 'not in', active_ips_set)
                 | list
               )
@@ -170,22 +155,24 @@
         status_code: 200
       loop: "{{ orphaned_records | dict2items | subelements('value') }}"
       loop_control:
-        label: "{{ item.0.key }} → {{ item.1.0 }}"
+        label: "{{ item.0.key }} → {{ item.1[0] }}"
       vars:
         domain: "{{ item.0.key }}"
-        record_id: "{{ item.1.1 }}"
-      when: confirmation.user_input | default('no') == 'yes'
+        record_id: "{{ item.1[1] }}"
+      when:
+        - confirmation.user_input | default('no') == 'yes'
+        - item.1 | length > 0
       register: delete_results
 
     - name: ✅ Отчёт об успешных удалениях
       debug:
-        msg: "✅ Удалена запись: {{ item.item.0.key }} → {{ item.item.1.0 }} (ID: {{ item.item.1.1 }})"
+        msg: "✅ Удалена запись: {{ item.item.0.key }} → {{ item.item.1[0] }} (ID: {{ item.item.1[1] }})"
       loop: "{{ delete_results.results | default([]) }}"
       when: item.status_code == 200
 
     - name: ❌ Ошибки при удалении
       debug:
-        msg: "❌ Ошибка при удалении {{ item.item.0.key }} → {{ item.item.1.0 }}: {{ item.status }} {{ item.status_text }}"
+        msg: "❌ Ошибка при удалении {{ item.item.0.key }} → {{ item.item.1[0] }}: {{ item.status }} {{ item.status_text }}"
       loop: "{{ delete_results.results | default([]) }}"
       when: item.status_code != 200
 
@@ -198,3 +185,4 @@
           {% else %}
           ℹ️ Удаление не потребовалось.
           {% endif %}
+
