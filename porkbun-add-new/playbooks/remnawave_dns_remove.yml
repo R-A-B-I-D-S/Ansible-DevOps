@@ -1,14 +1,16 @@
 ---
-- name: 🗑️ Удалить A-записи неактивных нод
+- name: 🗑️ Удалить A-записи неактивных нод Remnawave из DNS Porkbun
   hosts: localhost
   gather_facts: no
 
   vars:
+    # Работаем напрямую с target_domains — это домены 2-го уровня (apex)
     domains_to_process: "{{ target_domains }}"
 
   tasks:
-    # --- ШАГ 1: Получить список активных нод ---
-    - name: 🌐 Получить активные ноды из Remnawave
+
+    # --- ШАГ 1: Получить список всех нод из Remnawave API ---
+    - name: 🌐 Получить все ноды из Remnawave
       uri:
         url: "https://{{ remnawave_domain }}/api/nodes"
         method: GET
@@ -26,24 +28,33 @@
         msg: "Remnawave API вернул ошибку: {{ remnawave_response.json.message | default('Unknown error') }}"
       when: remnawave_response.json is defined and remnawave_response.json.errorCode is defined
 
-    - name: 🧩 Извлечь активные ноды
+    - name: 🧩 Извлечь неактивные ноды (isNodeOnline == false)
       set_fact:
-        active_nodes: >-
+        inactive_nodes: >-
           {{
             remnawave_response.json.response
-            | selectattr('isNodeOnline', 'equalto', true)
+            | selectattr('isNodeOnline', 'equalto', false)
             | list
           }}
 
-    - name: 🟡 Нет активных нод — ничего удалять не нужно
+    - name: 📄 Вывести список неактивных нод
       debug:
-        msg: "Нет активных нод. Удаление A-записей не требуется."
-      when: active_nodes | length == 0
+        msg: |-
+          НЕАКТИВНЫЕ НОДЫ ({{ inactive_nodes | length }} шт.):
+          {% for node in inactive_nodes %}
+          {{ "%2d" % loop.index }}) {{ node.name }} → {{ node.address }}
+          {% endfor %}
+      when: inactive_nodes | length > 0
 
-    # --- ШАГ 2: Получить текущие DNS A-записи для доменов ---
+    - name: 🟡 Нет неактивных нод — пропускаем DNS-операции
+      debug:
+        msg: "Нет неактивных нод в Remnawave. Ничего удалять не нужно."
+      when: inactive_nodes | length == 0
+
+    # --- ШАГ 2: Для каждого домена получить все DNS-записи ---
     - name: 🔍 Получить все DNS-записи для домена
       uri:
-        url: "https://api.porkbun.com/api/json/v3/dns/retrieve/{{ item }}"
+        url: "https://api.porkbun.com/api/json/v3/dns/retrieve/  {{ item }}"
         method: POST
         body:
           apikey: "{{ porkbun_api_key }}"
@@ -51,17 +62,33 @@
         body_format: json
         return_content: yes
       register: dns_retrieve_results
+      ignore_errors: yes
       loop: "{{ domains_to_process }}"
       loop_control:
         label: "{{ item }}"
 
-    - name: 🧩 Собрать все A-записи по доменам
+    # --- ШАГ 3: Проверить ошибки Porkbun API ---
+    - name: ❌ Проверить ошибку Porkbun API для домена
+      fail:
+        msg: "Porkbun API error for {{ item }}: {{ result.json.message | default('Unknown') }}"
+      when: result.json is defined and result.json.status != "SUCCESS"
+      loop: "{{ domains_to_process }}"
+      loop_control:
+        label: "{{ item }}"
+      vars:
+        result: "{{ dns_retrieve_results.results | selectattr('item', 'equalto', item) | first }}"
+
+    # --- ШАГ 4: Построить карту DNS-записей для поиска ---
+    - name: 🧩 Построить dns_records_map (все A-записи apex-домена)
       set_fact:
-        all_a_records: >-
+        dns_records_map: >-
           {{
-            all_a_records | default({}) | combine({
+            dns_records_map | default({}) | combine({
               item: (
-                (dns_retrieve_results.results | selectattr('item', 'equalto', item) | first).json.records
+                (
+                  (dns_retrieve_results.results | selectattr('item', 'equalto', item) | first | default({}))
+                  .json.records | default([])
+                )
                 | selectattr('type', 'equalto', 'A')
                 | selectattr('name', 'equalto', item)
                 | list
@@ -72,66 +99,113 @@
       loop_control:
         label: "{{ item }}"
 
-    # --- ШАГ 3: Вычислить IP неактивных нод ---
-    - name: 🧩 Определить неактивные IP
-      set_fact:
-        inactive_ips_map: >-
-          {{
-            inactive_ips_map | default({}) | combine({
-              domain: (
-                (all_a_records[domain] | map(attribute='content') | list)
-                | difference(active_nodes | map(attribute='address') | list)
-              )
-            })
-          }}
-      loop: "{{ domains_to_process }}"
-      loop_control:
-        loop_var: domain
-
-    - name: 📄 DEBUG — IP неактивных нод
+    # --- ДЕБАГ: Вывести dns_records_map ---
+    - name: 🐞 DEBUG — dns_records_map (все A-записи по доменам)
       debug:
-        var: inactive_ips_map
+        var: dns_records_map
 
-    # --- ШАГ 4: Удаление A-записей неактивных нод ---
-    - name:  Удалить A-записи неактивных нод
-      loop: "{{ domains_to_process }}"
+    # --- ШАГ 5: Найти записи для удаления ---
+    - name: 🧩 Найти A-записи неактивных нод для удаления
+      set_fact:
+        records_to_delete: >-
+          {{
+            records_to_delete | default([]) + 
+            [{
+              'domain': domain,
+              'record_id': record.id,
+              'record_name': record.name,
+              'record_ip': record.content,
+              'node_name': node.name
+            }]
+          }}
+      loop: "{{ inactive_nodes | product(domains_to_process) | list }}"
       loop_control:
-        loop_var: domain
-      block:
-        - name: 🗑️ Удаляем A-записи для {{ domain }}
-          uri:
-            url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ domain }}/{{ record.id }}"
-            method: POST
-            body:
-              apikey: "{{ porkbun_api_key }}"
-              secretapikey: "{{ porkbun_secret_api_key }}"
-            body_format: json
-            status_code: 200
-          loop: >-
-            {{
-              all_a_records[domain]
-              | selectattr('content', 'in', inactive_ips_map[domain])
-              | list
-            }}
-          loop_control:
-            loop_var: record
+        loop_var: pair
+        label: "{{ pair.1 }} → {{ pair.0.address }}"
+      vars:
+        node: "{{ pair.0 }}"
+        domain: "{{ pair.1 }}"
+        domain_records: "{{ dns_records_map[domain] | default([]) }}"
+      when:
+        - inactive_nodes | length > 0
+        - domain_records | length > 0
+      # Ищем запись, где IP неактивной ноды совпадает с IP в DNS-записи
+      with_items: "{{ domain_records }}"
+      loop_control:
+        loop_var: record
+      when: record.content == node.address | trim
 
-        - name: ✅ Лог удалённых записей для {{ domain }}
-          debug:
-            msg: "Удалена запись {{ record.name }} → {{ record.content }}"
-          loop: >-
-            {{
-              all_a_records[domain]
-              | selectattr('content', 'in', inactive_ips_map[domain])
-              | list
-            }}
-          loop_control:
-            loop_var: record
+    # --- ШАГ 6: Показать записи для удаления ---
+    - name: 📄 Записи для удаления
+      debug:
+        msg: |-
+          ЗАПИСИ ДЛЯ УДАЛЕНИЯ ({{ records_to_delete | default([]) | length }} шт.):
+          {% for record in records_to_delete | default([]) %}
+          {{ "%2d" % loop.index }}) {{ "%-30s" % record.record_name }} → {{ record.record_ip }} ({{ record.node_name }})
+          {% endfor %}
+      when: records_to_delete | default([]) | length > 0
 
-    # --- ФИНАЛ: Сводка ---
+    - name: 🟡 Нет записей для удаления
+      debug:
+        msg: "Нет A-записей неактивных нод для удаления."
+      when: records_to_delete | default([]) | length == 0
+
+    # --- ШАГ 7: Подтверждение удаления ---
+    - name: 🛑 Подтвердить удаление всех записей
+      pause:
+        prompt: |-
+          Будет удалено {{ records_to_delete | default([]) | length }} A-записей неактивных нод.
+          Введите 'yes' для подтверждения удаления, или нажмите Ctrl+C для отмены
+      register: deletion_confirmation
+      when: records_to_delete | default([]) | length > 0
+
+    # --- ШАГ 8: Удалить записи ---
+    - name: 🗑️ Удалить A-записи неактивных нод
+      uri:
+        url: "https://api.porkbun.com/api/json/v3/dns/delete/  {{ item.domain }}/{{ item.record_id }}"
+        method: POST
+        body:
+          apikey: "{{ porkbun_api_key }}"
+          secretapikey: "{{ porkbun_secret_api_key }}"
+        body_format: json
+        status_code: 200
+      loop: "{{ records_to_delete | default([]) }}"
+      loop_control:
+        label: "{{ item.record_name }} → {{ item.record_ip }}"
+      register: delete_results
+      when: 
+        - records_to_delete | default([]) | length > 0
+        - deletion_confirmation.user_input | default('') == 'yes'
+
+    # --- ШАГ 9: Отчёт об удалении ---
+    - name: ✅ Сводка по удалённым записям
+      debug:
+        msg: |-
+          УДАЛЁННЫЕ ЗАПИСИ:
+          {% for result in delete_results.results | default([]) %}
+          {% if result.changed %}
+          ✅ {{ result.item.record_name }} → {{ result.item.record_ip }} ({{ result.item.node_name }})
+          {% else %}
+          ❌ Ошибка удаления {{ result.item.record_name }}: {{ result.msg | default(result.status) }}
+          {% endif %}
+          {% endfor %}
+      when: delete_results is defined
+
     - name: 📊 Итоговая сводка
       debug:
-        msg: |
-          Синхронизация удаления A-записей завершена.
-          Активных нод: {{ active_nodes | length }}
-          Целевых доменов: {{ domains_to_process | length }}
+        msg: |-
+
+          Очистка DNS завершена.
+
+          Неактивных нод: {{ inactive_nodes | length }}
+          Доменов обработано: {{ domains_to_process | length }}
+          Записей удалено: {{ delete_results.results | selectattr('changed') | list | length | default(0) }}
+
+      when: inactive_nodes | length > 0
+
+    - name: 📊 Очистка не требовалась
+      debug:
+        msg: "ℹ️ Очистка не проводилась — неактивных нод не обнаружено или записи не найдены."
+      when: 
+        - inactive_nodes | length == 0 
+        or records_to_delete | default([]) | length == 0
