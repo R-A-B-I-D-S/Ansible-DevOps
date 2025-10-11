@@ -56,7 +56,7 @@
         body_format: json
         return_content: yes
       register: dns_retrieve_results
-      loop: "{{ domains_to_process }}"
+      loop: "{{ target_domains }}"
       loop_control:
         label: "{{ item }}"
 
@@ -65,7 +65,7 @@
       fail:
         msg: "Porkbun API error for {{ item }}: {{ result.json.message | default('Unknown') }}"
       when: result.json.status != "SUCCESS"
-      loop: "{{ domains_to_process }}"
+      loop: "{{ target_domains }}"
       loop_control:
         label: "{{ item }}"
       vars:
@@ -75,7 +75,7 @@
     - name: 🧩 Построить existing_a_records_map
       set_fact:
         existing_a_records_map: "{{ existing_a_records_map | default({}) | combine({ item: paired_records }) }}"
-      loop: "{{ domains_to_process }}"
+      loop: "{{ target_domains }}"
       loop_control:
         label: "{{ item }}"
       vars:
@@ -109,7 +109,7 @@
               )
             })
           }}
-      loop: "{{ domains_to_process }}"
+      loop: "{{ target_domains }}"
       loop_control:
         loop_var: domain
 
