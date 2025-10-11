@@ -101,9 +101,24 @@
           {{
             orphaned_records | default({}) | combine({
               domain: (
-                (existing_a_records_map[domain] | default([]))
-                | select('match', '.*')            # просто чтобы пройтись по элементам
-                | selectattr(0, 'none')            # технический хак, не обязателен
+                existing_a_records_map[domain] | default([])
+              )
+            })
+          }}
+      loop: "{{ target_domains }}"
+      loop_control:
+        loop_var: domain
+
+    # Фильтрация лишних записей (те, что не соответствуют активным IP)
+    - name: 🧩 Отфильтровать лишние записи
+      set_fact:
+        orphaned_records: >-
+          {{
+            orphaned_records | default({}) | combine({
+              domain: (
+                existing_a_records_map[domain] | default([])
+                | selectattr(0, 'not in', active_ips_set)
+                | list
               )
             })
           }}
