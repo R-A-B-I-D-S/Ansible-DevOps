@@ -71,10 +71,9 @@
       vars:
         result: "{{ dns_retrieve_results.results | selectattr('item', 'equalto', item) | first }}"
 
-    # --- ШАГ 4: Собрать карту A-записей (apex = '@') ---
     - name: 🧩 Построить existing_a_records_map
       set_fact:
-        existing_a_records_map: "{{ existing_a_records_map | default({}) | combine({ item: paired_records }) }}"
+        existing_a_records_map: "{{ existing_a_records_map | default({}) | combine({ item: records | map('extract', ['content', 'id']) | list }) }}"
       loop: "{{ target_domains }}"
       loop_control:
         label: "{{ item }}"
@@ -84,13 +83,11 @@
             (
               (dns_retrieve_results.results | selectattr('item', 'equalto', item) | first).json.records
               | selectattr('type', 'equalto', 'A')
-              | selectattr('name', 'equalto', '@')
+              | selectattr('name', 'in', ['@', item])
               | list
             )
           }}
-        paired_records: "{{ records | map('extract', {'content': 'content', 'id': 'id'}) | list | map('dict2items') | list | map('map', attribute='value') | list | map('list') | list }}"
-        # Альтернатива короче:
-        # paired_records: "{{ records | map('extract', ['content', 'id']) | list }}"
+
 
     - name: 🧩 Извлечь множество активных IP
       set_fact:
