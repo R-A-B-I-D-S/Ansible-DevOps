@@ -1,4 +1,4 @@
- ---
+---
 - name: "🗑️ Удалить A-записи для неактивных нод Remnawave из DNS Porkbun"
   hosts: localhost
   gather_facts: no
