@@ -2,6 +2,7 @@
 - name: 🗑️ Удалить A-записи для неактивных нод Remnawave из DNS Porkbun
   hosts: localhost
   gather_facts: no
+
   tasks:
 
     # --- ШАГ 1: Получить активные ноды из Remnawave API ---
@@ -71,9 +72,10 @@
       vars:
         result: "{{ dns_retrieve_results.results | selectattr('item', 'equalto', item) | first }}"
 
+    # --- ШАГ 4: Собрать карту A-записей ---
     - name: 🧩 Построить existing_a_records_map
       set_fact:
-        existing_a_records_map: "{{ existing_a_records_map | default({}) | combine({ item: records | map('extract', ['content', 'id']) | list }) }}"
+        existing_a_records_map: "{{ existing_a_records_map | default({}) | combine({ item: (records | map(attribute='content') | zip(records | map(attribute='id')) | list) }) }}"
       loop: "{{ target_domains }}"
       loop_control:
         label: "{{ item }}"
@@ -88,12 +90,11 @@
             )
           }}
 
-
     - name: 🧩 Извлечь множество активных IP
       set_fact:
         active_ips_set: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
 
-    # --- ШАГ 6: Найти лишние записи ---
+    # --- ШАГ 5: Найти лишние записи ---
     - name: 🧩 Найти лишние A-записи для удаления
       set_fact:
         orphaned_records: >-
