@@ -91,30 +91,40 @@
       vars:
         inactive_records: "{{ inactive_records | selectattr('name', 'equalto', item) | list }}"
 
-    # --- ШАГ 4: Удалить A-записи неактивных нод ---
     - name: 🗑️ Удалить A-записи неактивных нод через Porkbun
-      uri:
-        url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ item.0.name }}/{{ item.1.id }}"
-        method: POST
-        body:
-          apikey: "{{ porkbun_api_key }}"
-          secretapikey: "{{ porkbun_secret_api_key }}"
-        body_format: json
-        status_code: 200
-      loop: "{{ domains_to_process | product(inactive_records) | list }}"
-      loop_control:
-        label: "{{ item.0 }} → {{ item.1.content }}"
-      when: inactive_records | length > 0
       vars:
-        domain: "{{ item.0 }}"
-        record: "{{ item.1 }}"
-        inactive_records: >-
+        domain_inactive_records: >-
           {{
             (dns_retrieve_results.results | selectattr('item', 'equalto', domain) | first).json.records
             | selectattr('type', 'equalto', 'A')
             | rejectattr('content', 'in', active_nodes)
             | list
           }}
+      loop: "{{ domains_to_process }}"
+      loop_control:
+        loop_var: domain
+      when: domain_inactive_records | length > 0
+      block:
+
+    - name: 📄 Удаляем записи для домена {{ domain }}
+      debug:
+        msg: "Удаляем {{ item.content }} (ID {{ item.id }})"
+      loop: "{{ domain_inactive_records }}"
+      loop_control:
+        label: "{{ item.content }}"
+
+    - name: 🗑️ API вызов удаления записи
+      uri:
+        url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ domain }}/{{ item.id }}"
+        method: POST
+        body:
+          apikey: "{{ porkbun_api_key }}"
+          secretapikey: "{{ porkbun_secret_api_key }}"
+        body_format: json
+        status_code: 200
+      loop: "{{ domain_inactive_records }}"
+      loop_control:
+        label: "{{ item.content }}"
 
     - name: ✅ Отчёт об удалении
       debug:
