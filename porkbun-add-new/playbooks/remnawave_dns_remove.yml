@@ -1,12 +1,12 @@
  ---
-- name: 🗑️ Удалить A-записи для неактивных нод Remnawave из DNS Porkbun
+- name: "🗑️ Удалить A-записи для неактивных нод Remnawave из DNS Porkbun"
   hosts: localhost
   gather_facts: no
 
   tasks:
 
     # --- ШАГ 1: Получить активные ноды из Remnawave API ---
-    - name: 🌐 Получить активные ноды из Remnawave
+    - name: "🌐 Получить активные ноды из Remnawave"
       uri:
         url: "https://{{ remnawave_domain }}/api/nodes"
         method: GET
@@ -19,12 +19,12 @@
       retries: 3
       delay: 5
 
-    - name: ❌ Проверить ошибку Remnawave API
+    - name: "❌ Проверить ошибку Remnawave API"
       fail:
         msg: "Remnawave API вернул ошибку: {{ remnawave_response.json.message | default('Unknown error') }}"
       when: remnawave_response.json is defined and remnawave_response.json.errorCode is defined
 
-    - name: 🧩 Извлечь активные ноды (isNodeOnline == true)
+    - name: "🧩 Извлечь активные ноды (isNodeOnline == true)"
       set_fact:
         active_nodes: >-
           {{
@@ -33,7 +33,7 @@
             | list
           }}
 
-    - name: 📄 Вывести список активных нод
+    - name: "📄 Вывести список активных нод"
       debug:
         msg: |-
           АКТИВНЫЕ НОДЫ ({{ active_nodes | length }} шт.):
@@ -41,13 +41,13 @@
           {{ "%2d" % loop.index }}) {{ node.name }} → {{ node.address }}
           {% endfor %}
 
-    - name: 🟡 Нет активных нод — пропускаем DNS-операции
+    - name: "🟡 Нет активных нод — пропускаем DNS-операции"
       debug:
         msg: "Нет активных нод в Remnawave. Удалять нечего."
       when: active_nodes | length == 0
 
     # --- ШАГ 2: Получить DNS-записи для доменов ---
-    - name: 🔍 Получить все DNS-записи для домена
+    - name: "🔍 Получить все DNS-записи для домена"
       uri:
         url: "https://api.porkbun.com/api/json/v3/dns/retrieve/{{ item }}"
         method: POST
@@ -62,7 +62,7 @@
         label: "{{ item }}"
 
     # --- ШАГ 3: Проверить статусы Porkbun ---
-    - name: ❌ Проверить ошибку Porkbun API
+    - name: "❌ Проверить ошибку Porkbun API"
       fail:
         msg: "Porkbun API error for {{ item }}: {{ result.json.message | default('Unknown') }}"
       when: result.json.status != "SUCCESS"
@@ -73,7 +73,7 @@
         result: "{{ dns_retrieve_results.results | selectattr('item', 'equalto', item) | first }}"
 
     # --- ШАГ 4: Собрать карту A-записей ---
-    - name: 🧩 Построить existing_a_records_map
+    - name: "🧩 Построить existing_a_records_map"
       set_fact:
         existing_a_records_map: "{{ existing_a_records_map | default({}) | combine({ item: (records | map(attribute='content') | zip(records | map(attribute='id')) | list) }) }}"
       loop: "{{ target_domains }}"
@@ -90,12 +90,12 @@
             )
           }}
 
-    - name: 🧩 Извлечь множество активных IP
+    - name: "🧩 Извлечь множество активных IP"
       set_fact:
         active_ips_set: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
 
     # --- ШАГ 5: Найти лишние записи ---
-    - name: 🧩 Найти лишние A-записи для удаления
+    - name: "🧩 Найти лишние A-записи для удаления"
       set_fact:
         orphaned_records: >-
           {{
@@ -111,11 +111,11 @@
       loop_control:
         loop_var: domain
 
-    - name: 🐞 DEBUG — orphaned_records (IP → ID)
+    - name: "🐞 DEBUG — orphaned_records (IP → ID)"
       debug:
         var: orphaned_records
 
-    - name: 📄 Сводка записей для удаления
+    - name: "📄 Сводка записей для удаления"
       debug:
         msg: |-
           ДОМЕН: {{ domain }}
@@ -134,17 +134,17 @@
         domain: "{{ item.key }}"
         records: "{{ item.value }}"
 
-    - name: 🧮 Подсчитать общее количество записей
+    - name: "🧮 Подсчитать общее количество записей"
       set_fact:
         total_orphaned: "{{ orphaned_records | dict2items | map(attribute='value') | map('length') | sum }}"
 
-    - name: 🛑 Подтвердите удаление
+    - name: "🛑 Подтвердите удаление"
       pause:
         prompt: "⚠️ Будет удалено {{ total_orphaned }} записей. Введите 'yes' для подтверждения или Ctrl+C для отмены"
       register: confirmation
       when: total_orphaned | int > 0
 
-    - name: 🗑️ Удалить лишние A-записи
+    - name: "🗑️ Удалить лишние A-записи"
       uri:
         url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ domain }}/{{ record_id }}"
         method: POST
@@ -164,19 +164,19 @@
         - item.1 | length > 0
       register: delete_results
 
-    - name: ✅ Отчёт об успешных удалениях
+    - name: "✅ Отчёт об успешных удалениях"
       debug:
         msg: "✅ Удалена запись: {{ item.item.0.key }} → {{ item.item.1[0] }} (ID: {{ item.item.1[1] }})"
       loop: "{{ delete_results.results | default([]) }}"
       when: item.status_code == 200
 
-    - name: ❌ Ошибки при удалении
+    - name: "❌ Ошибки при удалении"
       debug:
         msg: "❌ Ошибка при удалении {{ item.item.0.key }} → {{ item.item.1[0] }}: {{ item.status }} {{ item.status_text }}"
       loop: "{{ delete_results.results | default([]) }}"
       when: item.status_code != 200
 
-    - name: 📊 Финальный отчёт
+    - name: "📊 Финальный отчёт"
       debug:
         msg: |-
           {% set total_deleted = (delete_results.results | default([]) | selectattr('status_code', 'equalto', 200) | list | length) %}
