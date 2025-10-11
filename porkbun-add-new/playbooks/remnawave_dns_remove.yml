@@ -207,5 +207,4 @@
       debug:
         msg: "ℹ️ Очистка не проводилась — неактивных нод не обнаружено или записи не найдены."
       when: 
-        - inactive_nodes | length == 0 
-        or records_to_delete | default([]) | length == 0
+        - inactive_nodes | length == 0 or records_to_delete | default([]) | length == 0
