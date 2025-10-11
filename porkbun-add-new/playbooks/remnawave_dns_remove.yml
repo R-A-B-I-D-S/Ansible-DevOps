@@ -43,7 +43,7 @@
     # --- ШАГ 2: Получить текущие DNS A-записи для доменов ---
     - name: 🔍 Получить все DNS-записи для домена
       uri:
-        url: "https://api.porkbun.com/api/json/v3/dns/retrieve/  {{ item }}"
+        url: "https://api.porkbun.com/api/json/v3/dns/retrieve/{{ item }}"
         method: POST
         body:
           apikey: "{{ porkbun_api_key }}"
@@ -72,8 +72,8 @@
       loop_control:
         label: "{{ item }}"
 
-    # --- ШАГ 3: Определить неактивные IP ---
-    - name: 🧩 Вычислить IP неактивных нод
+    # --- ШАГ 3: Вычислить IP неактивных нод ---
+    - name: 🧩 Определить неактивные IP
       set_fact:
         inactive_ips_map: >-
           {{
@@ -92,45 +92,46 @@
       debug:
         var: inactive_ips_map
 
-    # --- ШАГ 4: Удалить A-записи неактивных нод ---
+    # --- ШАГ 4: Удаление A-записей неактивных нод ---
     - name: 🚫 Удалить A-записи неактивных нод
-      uri:
-        url: "https://api.porkbun.com/api/json/v3/dns/delete/  {{ domain }}/{{ record.id }}"
-        method: POST
-        body:
-          apikey: "{{ porkbun_api_key }}"
-          secretapikey: "{{ porkbun_secret_api_key }}"
-        body_format: json
-        status_code: 200
-      loop: "{{ domains_to_process | product([0]) | list }}"
+      loop: "{{ domains_to_process }}"
       loop_control:
-        loop_var: domain_pair
-      vars:
-        domain: "{{ domain_pair[0] }}"
-        records_to_delete: >-
-          {{
-            all_a_records[domain]
-            | selectattr('content', 'in', inactive_ips_map[domain])
-            | list
-          }}
-      with_items: "{{ records_to_delete }}"
-      loop_control:
-        loop_var: record
+        loop_var: domain
+      block:
+        - name: 🗑️ Удаляем A-записи для {{ domain }}
+          uri:
+            url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ domain }}/{{ record.id }}"
+            method: POST
+            body:
+              apikey: "{{ porkbun_api_key }}"
+              secretapikey: "{{ porkbun_secret_api_key }}"
+            body_format: json
+            status_code: 200
+          loop: >-
+            {{
+              all_a_records[domain]
+              | selectattr('content', 'in', inactive_ips_map[domain])
+              | list
+            }}
+          loop_control:
+            loop_var: record
 
-    - name: ✅ Отчёт об удалении
+        - name: ✅ Лог удалённых записей для {{ domain }}
+          debug:
+            msg: "Удалена запись {{ record.name }} → {{ record.content }}"
+          loop: >-
+            {{
+              all_a_records[domain]
+              | selectattr('content', 'in', inactive_ips_map[domain])
+              | list
+            }}
+          loop_control:
+            loop_var: record
+
+    # --- ФИНАЛ: Сводка ---
+    - name: 📊 Итоговая сводка
       debug:
-        msg: "Удалена запись {{ record.name }} → {{ record.content }}"
-      loop: "{{ domains_to_process | product([0]) | list }}"
-      loop_control:
-        loop_var: domain_pair
-      vars:
-        domain: "{{ domain_pair[0] }}"
-        records_to_delete: >-
-          {{
-            all_a_records[domain]
-            | selectattr('content', 'in', inactive_ips_map[domain])
-            | list
-          }}
-      with_items: "{{ records_to_delete }}"
-      loop_control:
-        loop_var: record
+        msg: |
+          Синхронизация удаления A-записей завершена.
+          Активных нод: {{ active_nodes | length }}
+          Целевых доменов: {{ domains_to_process | length }}
