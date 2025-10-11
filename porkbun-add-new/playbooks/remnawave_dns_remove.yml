@@ -110,8 +110,8 @@
             orphaned_records | default({}) | combine({
               domain: (
                 (existing_a_records_map[domain] | default([]))
-                | select('match', '.*')  # Пройтись по всем кортежам
-                | selectattr(0, 'not in', active_ips_set)  # Фильтровать по IP (первый элемент кортежа)
+                | select('match', '.*')
+                | selectattr(0, 'not in', active_ips_set)
                 | list
               )
             })
