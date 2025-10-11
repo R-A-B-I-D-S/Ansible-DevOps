@@ -85,10 +85,18 @@
             (
               (dns_retrieve_results.results | selectattr('item', 'equalto', item) | first).json.records
               | selectattr('type', 'equalto', 'A')
-              | selectattr('name', 'in', ['@', item.split('.')[0]])
+              | selectattr('name', 'in', ['@', item])
               | list
             )
           }}
+
+    - name: "🐞 DEBUG — existing_a_records_map"
+      debug:
+        var: existing_a_records_map
+
+    - name: "🐞 DEBUG — active_ips_set"
+      debug:
+        var: active_ips_set
 
     - name: "🧩 Извлечь множество активных IP"
       set_fact:
@@ -102,7 +110,8 @@
             orphaned_records | default({}) | combine({
               domain: (
                 (existing_a_records_map[domain] | default([]))
-                | selectattr(0, 'not in', active_ips_set)
+                | select('match', '.*')  # Пройтись по всем кортежам
+                | selectattr(0, 'not in', active_ips_set)  # Фильтровать по IP (первый элемент кортежа)
                 | list
               )
             })
@@ -111,9 +120,12 @@
       loop_control:
         loop_var: domain
 
-    - name: "🐞 DEBUG — orphaned_records (IP → ID)"
+    - name: "🐞 DEBUG — записи для каждого домена"
       debug:
-        var: orphaned_records
+        msg: |-
+          ДОМЕН: {{ item }}
+          ЗАПИСИ: {{ existing_a_records_map[item] | default([]) }}
+      loop: "{{ target_domains }}"
 
     - name: "📄 Сводка записей для удаления"
       debug:
