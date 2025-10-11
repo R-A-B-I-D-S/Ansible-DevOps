@@ -1,14 +1,12 @@
 ---
-- name: 🗑️ Удалить A-записи неактивных нод
+- name: "🗑️ Удалить A-записи для неактивных нод Remnawave из DNS Porkbun"
   hosts: localhost
   gather_facts: no
 
-  vars:
-    domains_to_process: "{{ target_domains }}"
-
   tasks:
-    # --- ШАГ 1: Получить список активных нод ---
-    - name: 🌐 Получить активные ноды из Remnawave
+
+    # --- ШАГ 1: Получить активные ноды из Remnawave API ---
+    - name: "🌐 Получить активные ноды из Remnawave"
       uri:
         url: "https://{{ remnawave_domain }}/api/nodes"
         method: GET
@@ -21,12 +19,12 @@
       retries: 3
       delay: 5
 
-    - name: ❌ Проверить ошибку Remnawave API
+    - name: "❌ Проверить ошибку Remnawave API"
       fail:
         msg: "Remnawave API вернул ошибку: {{ remnawave_response.json.message | default('Unknown error') }}"
       when: remnawave_response.json is defined and remnawave_response.json.errorCode is defined
 
-    - name: 🧩 Извлечь активные ноды
+    - name: "🧩 Извлечь активные ноды (isNodeOnline == true)"
       set_fact:
         active_nodes: >-
           {{
@@ -35,15 +33,23 @@
             | list
           }}
 
-    - name: 🟡 Нет активных нод — ничего удалять не нужно
+    - name: "📄 Вывести список активных нод"
       debug:
-        msg: "Нет активных нод. Удаление A-записей не требуется."
+        msg: |-
+          АКТИВНЫЕ НОДЫ ({{ active_nodes | length }} шт.):
+          {% for node in active_nodes %}
+          {{ "%2d" % loop.index }}) {{ node.name }} → {{ node.address }}
+          {% endfor %}
+
+    - name: "🟡 Нет активных нод — пропускаем DNS-операции"
+      debug:
+        msg: "Нет активных нод в Remnawave. Удалять нечего."
       when: active_nodes | length == 0
 
-    # --- ШАГ 2: Получить текущие DNS A-записи для доменов ---
-    - name: 🔍 Получить все DNS-записи для домена
+    # --- ШАГ 2: Получить DNS-записи для доменов ---
+    - name: "🔍 Получить все DNS-записи для домена"
       uri:
-        url: "https://api.porkbun.com/api/json/v3/dns/retrieve/  {{ item }}"
+        url: "https://api.porkbun.com/api/json/v3/dns/retrieve/{{ item }}"
         method: POST
         body:
           apikey: "{{ porkbun_api_key }}"
@@ -51,86 +57,162 @@
         body_format: json
         return_content: yes
       register: dns_retrieve_results
-      loop: "{{ domains_to_process }}"
+      loop: "{{ target_domains }}"
       loop_control:
         label: "{{ item }}"
 
-    - name: 🧩 Собрать все A-записи по доменам
+    # --- ШАГ 3: Проверить статусы Porkbun ---
+    - name: "❌ Проверить ошибку Porkbun API"
+      fail:
+        msg: "Porkbun API error for {{ item }}: {{ result.json.message | default('Unknown') }}"
+      when: result.json.status != "SUCCESS"
+      loop: "{{ target_domains }}"
+      loop_control:
+        label: "{{ item }}"
+      vars:
+        result: "{{ dns_retrieve_results.results | selectattr('item', 'equalto', item) | first }}"
+
+    # --- ШАГ 4: Собрать карту A-записей (как в add.yml) ---
+    - name: "🧩 Построить existing_a_records_map"
       set_fact:
-        all_a_records: >-
+        existing_a_records_map: "{{ existing_a_records_map | default({}) | combine({ item: (records | map(attribute='content') | zip(records | map(attribute='id')) | list) }) }}"
+      loop: "{{ target_domains }}"
+      loop_control:
+        label: "{{ item }}"
+      vars:
+        records: >-
           {{
-            all_a_records | default({}) | combine({
-              item: (
-                (dns_retrieve_results.results | selectattr('item', 'equalto', item) | first).json.records
-                | selectattr('type', 'equalto', 'A')
-                | selectattr('name', 'equalto', item)
+            (
+              (dns_retrieve_results.results | selectattr('item', 'equalto', item) | first).json.records
+              | selectattr('type', 'equalto', 'A')
+              | selectattr('name', 'equalto', item)
+              | list
+            )
+          }}
+
+    - name: "🐞 DEBUG — existing_a_records_map"
+      debug:
+        var: existing_a_records_map
+
+    - name: "🧩 Извлечь множество активных IP"
+      set_fact:
+        active_ips_set: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
+
+    - name: "🐞 DEBUG — active_ips_set"
+      debug:
+        var: active_ips_set
+
+    # --- ШАГ 5: Найти лишние записи (зеркальная логика к add.yml) ---
+    - name: "🧩 Найти лишние A-записи для удаления"
+      set_fact:
+        orphaned_records: >-
+          {{
+            orphaned_records | default({}) | combine({
+              domain: (
+                (existing_a_records_map[domain] | default([]))
+                | selectattr(0, 'not in', active_ips_set)
                 | list
               )
             })
           }}
-      loop: "{{ domains_to_process }}"
-      loop_control:
-        label: "{{ item }}"
-
-    # --- ШАГ 3: Определить неактивные IP ---
-    - name: 🧩 Вычислить IP неактивных нод
-      set_fact:
-        inactive_ips_map: >-
-          {{
-            inactive_ips_map | default({}) | combine({
-              domain: (
-                (all_a_records[domain] | map(attribute='content') | list)
-                | difference(active_nodes | map(attribute='address') | list)
-              )
-            })
-          }}
-      loop: "{{ domains_to_process }}"
+      loop: "{{ target_domains }}"
       loop_control:
         loop_var: domain
+      when: active_ips_set is defined and active_ips_set | length > 0
 
-    - name: 📄 DEBUG — IP неактивных нод
+    - name: "🧩 Если нет активных нод — все записи лишние"
+      set_fact:
+        orphaned_records: "{{ existing_a_records_map }}"
+      when: active_ips_set is defined and active_ips_set | length == 0
+
+    - name: "🐞 DEBUG — orphaned_records"
       debug:
-        var: inactive_ips_map
+        var: orphaned_records
 
-    # --- ШАГ 4: Удалить A-записи неактивных нод ---
-    - name: 🚫 Удалить A-записи неактивных нод
+    - name: "🐞 DEBUG — Сравнение IP по домену"
+      debug:
+        msg: |-
+          Домен: {{ domain }}
+          Активные IP: {{ active_ips }}
+          Существующие IP: {{ existing_ips }}
+          Лишние IP для удаления: {{ orphaned_ips }}
+      loop: "{{ target_domains }}"
+      loop_control:
+        label: "{{ domain }}"
+      vars:
+        domain: "{{ item }}"
+        existing_ips: "{{ existing_a_records_map[item] | default([]) | map(attribute='0') | list }}"
+        active_ips: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
+        orphaned_ips: "{{ existing_ips | difference(active_ips) }}"
+
+    - name: "📄 Сводка записей для удаления"
+      debug:
+        msg: |-
+          ДОМЕН: {{ domain }}
+          {% if records | length > 0 %}
+          Найдено лишних записей: {{ records | length }}
+          {% for ip, id in records %}
+          → {{ ip }} (ID: {{ id }})
+          {% endfor %}
+          {% else %}
+          ✅ Нет записей для удаления
+          {% endif %}
+      loop: "{{ orphaned_records | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+      vars:
+        domain: "{{ item.key }}"
+        records: "{{ item.value }}"
+
+    - name: "🧮 Подсчитать общее количество записей"
+      set_fact:
+        total_orphaned: "{{ orphaned_records | dict2items | map(attribute='value') | map('length') | sum }}"
+
+    - name: "🛑 Подтвердите удаление"
+      pause:
+        prompt: "⚠️ Будет удалено {{ total_orphaned }} записей. Введите 'yes' для подтверждения или Ctrl+C для отмены"
+      register: confirmation
+      when: total_orphaned | int > 0
+
+    - name: "🗑️ Удалить лишние A-записи"
       uri:
-        url: "https://api.porkbun.com/api/json/v3/dns/delete/  {{ domain }}/{{ record.id }}"
+        url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ domain }}/{{ record_id }}"
         method: POST
         body:
           apikey: "{{ porkbun_api_key }}"
           secretapikey: "{{ porkbun_secret_api_key }}"
         body_format: json
         status_code: 200
-      loop: "{{ domains_to_process | product([0]) | list }}"
+      loop: "{{ orphaned_records | dict2items | subelements('value') }}"
       loop_control:
-        loop_var: domain_pair
+        label: "{{ item.0.key }} → {{ item.1[0] }}"
       vars:
-        domain: "{{ domain_pair[0] }}"
-        records_to_delete: >-
-          {{
-            all_a_records[domain]
-            | selectattr('content', 'in', inactive_ips_map[domain])
-            | list
-          }}
-      with_items: "{{ records_to_delete }}"
-      loop_control:
-        loop_var: record
+        domain: "{{ item.0.key }}"
+        record_id: "{{ item.1[1] }}"
+      when:
+        - confirmation.user_input | default('no') == 'yes'
+        - item.1 | length > 0
+      register: delete_results
 
-    - name: ✅ Отчёт об удалении
+    - name: "✅ Отчёт об успешных удалениях"
       debug:
-        msg: "Удалена запись {{ record.name }} → {{ record.content }}"
-      loop: "{{ domains_to_process | product([0]) | list }}"
-      loop_control:
-        loop_var: domain_pair
-      vars:
-        domain: "{{ domain_pair[0] }}"
-        records_to_delete: >-
-          {{
-            all_a_records[domain]
-            | selectattr('content', 'in', inactive_ips_map[domain])
-            | list
-          }}
-      with_items: "{{ records_to_delete }}"
-      loop_control:
-        loop_var: record
+        msg: "✅ Удалена запись: {{ item.item.0.key }} → {{ item.item.1[0] }} (ID: {{ item.item.1[1] }})"
+      loop: "{{ delete_results.results | default([]) }}"
+      when: item.status_code == 200
+
+    - name: "❌ Ошибки при удалении"
+      debug:
+        msg: "❌ Ошибка при удалении {{ item.item.0.key }} → {{ item.item.1[0] }}: {{ item.status }} {{ item.status_text }}"
+      loop: "{{ delete_results.results | default([]) }}"
+      when: item.status_code != 200
+
+    - name: "📊 Финальный отчёт"
+      debug:
+        msg: |-
+          {% set total_deleted = (delete_results.results | default([]) | selectattr('status_code', 'equalto', 200) | list | length) %}
+          {% if total_deleted > 0 %}
+          ✅ Удалено записей: {{ total_deleted }}
+          {% else %}
+          ℹ️ Удаление не потребовалось.
+          {% endif %}
+
