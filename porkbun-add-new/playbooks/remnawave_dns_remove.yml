@@ -136,6 +136,9 @@
         records: "{{ item.value }}"
         count: "{{ item.value | length }}"
 
+    - debug:
+        var: dns_retrieve_results.results
+
     # --- ШАГ 9: Подтверждение удаления ---
     - name: 🛑 Подтвердите удаление записей (введите 'yes')
       pause:
