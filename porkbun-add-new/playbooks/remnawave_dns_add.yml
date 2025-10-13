@@ -177,22 +177,23 @@
 
     # --- ШАГ 9: Удалить лишние записи через API ---
     - name: 🗑️ Удалить лишние A-записи
-      uri:
-        url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ domain }}/{{ item.1 }}"
-        method: POST
-        body:
-          apikey: "{{ porkbun_api_key }}"
-          secretapikey: "{{ porkbun_secret_api_key }}"
-        body_format: json
-        status_code: 200
-      loop: "{{ orphaned_records | dict2items | subelements('value') }}"
-      loop_control:
-        label: "{{ item.0.key }} → {{ item.1.0 }} (ID: {{ item.1.1 }})"
       vars:
-        domain: "{{ item.0.key }}"
-      when: confirmation.user_input | default('no') == 'yes'
-      register: delete_results
-
+        orphaned_records_list: "{{ orphaned_records | dict2items | subelements('value') }}"
+      block:
+        - name: 🗑️ Удаляем запись
+          uri:
+            url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ item.0.key }}/{{ item.1.1 }}"
+            method: POST
+            body:
+              apikey: "{{ porkbun_api_key }}"
+              secretapikey: "{{ porkbun_secret_api_key }}"
+            body_format: json
+            status_code: 200
+          loop: "{{ orphaned_records_list }}"
+          loop_control:
+            label: "{{ item.0.key }} → {{ item.1.0 }} (ID: {{ item.1.1 }})"
+          register: delete_results
+      
     # --- ШАГ 10: Отчёт об удалении ---
     - name: ✅ Отчёт успешные удаления
       debug:
