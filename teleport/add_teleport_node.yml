@@ -2,26 +2,33 @@
   become: true
 
   tasks:
-    - name: Скачать архив Teleport 17.7.7
+  - name: Set Teleport repo URL based on OS
+    set_fact:
+      zabbix_repo_url: >-
+        {% if ansible_facts['os_family'] == 'Debian' and ansible_facts['distribution'] | lower == 'ubuntu' %}
+          https://cdn.teleport.dev/teleport_17.7.0_amd64.deb
+        {% elif ansible_facts['os_family'] == 'Debian' and ansible_facts['distribution'] | lower == 'debian' %}
+          https://cdn.teleport.dev/teleport_17.7.0_amd64.deb
+        {% else %}
+          ""
+        {% endif %}
+
+    - name: Show which OS and repo URL will be used
+      debug:
+        msg: "Detected OS: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }} → Repo: {{ teleport_repo_url }}"
+
+    - name: Download Teleport repository package
       get_url:
-        url: "https://cdn.teleport.dev/teleport-v17.7.7-linux-amd64-bin.tar.gz"
-        dest: "/tmp/teleport-v17.7.7-linux-amd64-bin.tar.gz"
+        url: "{{ zabbix_repo_url }}"
+        dest: /tmp/teleport-17.7.0.deb
         mode: '0644'
+      when: teleport_repo_url != ""
 
-    - name: Распаковать архив Teleport 17.7.7
-      unarchive:
-        src: "/tmp/teleport-v17.7.7-linux-amd64-bin.tar.gz"
-        dest: "/tmp/"
-        remote_src: yes
-
-    - name: Переместить бинарник teleport в /usr/bin/
-      copy:
-        src: "/tmp/teleport/teleport"
-        dest: "/usr/bin/teleport"
-        mode: '0755'
-        owner: root
-        group: root
-        remote_src: yes
+    - name: Install Teleport repository
+      apt:
+        deb: /tmp/teleport-17.7.0.deb
+        state: present
+      when: teleport_repo_url != ""
 
     - name: Deploy teleport.yaml (with proper nodename and label)
       template:
