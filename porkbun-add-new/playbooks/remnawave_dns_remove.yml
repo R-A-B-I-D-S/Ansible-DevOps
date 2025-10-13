@@ -11,7 +11,7 @@
     # --- ШАГ 1: Получить список активных нод из Remnawave API ---
     - name: 🌐 Получить активные ноды из Remnawave
       uri:
-        url: "https://{{ remnawave_domail }}/api/nodes"
+        url: "https://{{ remnawave_domain }}/api/nodes"
         method: GET
         headers:
           Authorization: "Bearer {{ remnawave_token }}"
