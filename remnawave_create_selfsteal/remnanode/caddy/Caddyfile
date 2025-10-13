@@ -1,3 +1,14 @@
+{
+    storage redis {
+        host 144.31.2.123
+        port 6379
+        password UQlm12LOr9I1lu
+        key_prefix caddy_
+        db 0
+    }
+    auto_https off
+}
+
 my-rebar.shop:80 {
     redir https://{host}{uri} permanent
 }
