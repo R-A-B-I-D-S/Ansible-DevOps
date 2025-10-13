@@ -1,0 +1,59 @@
+- name: Установка и запуск remnanode через Docker Compose
+  hosts: servers
+  become: yes
+  vars:
+    remnanode_dir: /opt/remnanode
+    app_port: 2222
+    ssl_cert: "SSL_CERT=eyJub2RlQ2VydFBlbSI6Ii0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLVxuTUlJQmh6Q0NBU3lnQXdJQkFnSUhBWFZ3ZG5oSmtqQUtCZ2dxaGtqT1BRUURBakFoTVI4d0hRWURWUVFERXhaUVxuTURGQk5HWTNZMjV6T0VJeVIxTjJRMU5aZWxSdk1CNFhEVEkxTURrd05URXlOVE13TkZvWERUSTRNRGt3TlRFeVxuTlRNd05Gb3dPREUyTURRR0ExVUVBd3d0Y1VKTFVXVjVkR3B3Tm1OTFJYSklPVmhTWlhOWVkza3lWRXMyTVZNNFxuWVZCblVIWTFNbWhaUTBNMGNrUmZNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUVzbzU3ZHlGYVxuY3VIMGFnYzZQSkF4Q0ZrMy9tZmNOSlhiN1Y3dXZrZ3NJNzBkQjlESERrV2tnTmV6RjEvbWdJK3dIM2FKVkxuZ1xuTk1JMThFTy9lRWlndTZNNE1EWXdEQVlEVlIwVEFRSC9CQUl3QURBT0JnTlZIUThCQWY4RUJBTUNCYUF3RmdZRFxuVlIwbEFRSC9CQXd3Q2dZSUt3WUJCUVVIQXdFd0NnWUlLb1pJemowRUF3SURTUUF3UmdJaEFLbFlOVmRtWDhqYVxuUzBhV1VxYnVyaWxiZUI5UkZyRUh0Q2cydlNiQVExczRBaUVBc1lLTmV5N3QrWGFSMkRDNnZ2VUFuVEJrSHBua1xuWW5PSVFuZ3RJbU5RYlRzPVxuLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLSIsIm5vZGVLZXlQZW0iOiItLS0tLUJFR0lOIFBSSVZBVEUgS0VZLS0tLS1cbk1JR0hBZ0VBTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEJHMHdhd0lCQVFRZ2lnejFYVmpwbkpoRk4zNUpcbnl5UTM3VFFabjRGdzhRZThyZWZsTWxnT2p2aWhSQU5DQUFTeWpudDNJVnB5NGZScUJ6bzhrREVJV1RmK1o5dzBcbmxkdnRYdTYrU0N3anZSMEgwTWNPUmFTQTE3TVhYK2FBajdBZmRvbFV1ZUEwd2pYd1E3OTRTS0M3XG4tLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tIiwiY2FDZXJ0UGVtIjoiLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tXG5NSUlCVXpDQitxQURBZ0VDQWdFQk1Bb0dDQ3FHU000OUJBTUNNQ0V4SHpBZEJnTlZCQU1URmxBd01VRTBaamRqXG5ibk00UWpKSFUzWkRVMWw2Vkc4d0hoY05NalV3T0RFMk1UZ3lNVFV4V2hjTk16VXdPREUyTVRneU1UVXhXakFoXG5NUjh3SFFZRFZRUURFeFpRTURGQk5HWTNZMjV6T0VJeVIxTjJRMU5aZWxSdk1Ga3dFd1lIS29aSXpqMENBUVlJXG5Lb1pJemowREFRY0RRZ0FFdXBTMzYvU3A5VlpjVmgzQm1LOVBlcmduc1VmaG5NNVJQYTZxRGszbjk5ZkJFZmxiXG5iN3UrTXhMY1NqQ2hHN1I4VUwvUU9vcWlHRkIyRXd0eTNqazU0Nk1qTUNFd0R3WURWUjBUQVFIL0JBVXdBd0VCXG4vekFPQmdOVkhROEJBZjhFQkFNQ0FvUXdDZ1lJS29aSXpqMEVBd0lEU0FBd1JRSWdmTW5jT1pvTlM5dnhoOEFaXG5sZ3BoMGx3T2Jja1hCSTdHbnBFUDJQMjIvZGNDSVFESndzVTdveE0wNXFMblU1bEVoVnR6eHZKbXVuWWYrVi9tXG5Xc3dVTmxqOEVnPT1cbi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0iLCJqd3RQdWJsaWNLZXkiOiItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFwdUpNb0ZOek50clZGZzRtSE1ydlxuYXVYT28zWXFNbHpKYmhwTnZVMVVtRmdUU1ZJR29CbTlEWXRia0diRWNnZUNWbnVLTEZ0ZFhlTHNVT3NPTkNja1xuSllGYUt0NGhJY242RzM0MTFjMnVIWTRxakdUTlY0MnNwR2xuWC9xVElOVTE0WDFCSnBXNjhKQkQ4N2tFVzFHeVxucGpUN1h5OHJ5aVJDL0x2WnN5aUtWVHVldUVsVU4vb3VHck1tckhnVjk2ZXRENDJQZ1hBVTd1cys1RUJnMmEya1xuam9ReFNYM3NBcHhWYjlJc0Q4cjhvQkVlMjFZVzJwU1R1eGdXNng4Uy93Wk5CQjErU0syR1A4T0JVdlVZM2FiT1xubmpyRFZmYVRVbEFYUUZyczRMclFmbDE0WitKZzczWC9iZkN4TGVXUUNESTB3QUhRYW1FNCtkSTZNYVQ5cmJNWFxuUHdJREFRQUJcbi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLVxuIn0="
+  tasks:
+    - name: Установить Docker
+      shell: curl -fsSL https://get.docker.com | sh
+      args:
+        creates: /usr/bin/docker
+
+    - name: Создать каталог проекта
+      file:
+        path: "{{ remnanode_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Создать .env для remnanode
+      copy:
+        dest: "{{ remnanode_dir }}/.env"
+        content: |
+          APP_PORT={{ app_port }}
+          {{ ssl_cert }}
+
+    - name: Создать docker-compose.yml
+      copy:
+        dest: "{{ remnanode_dir }}/docker-compose.yml"
+        content: |
+          services:
+            remnanode:
+              container_name: remnanode
+              hostname: remnanode
+              image: remnawave/node:latest
+              restart: always
+              network_mode: host
+              env_file:
+                - .env
+
+    - name: Запустить контейнер remnanode через Docker Compose
+      shell: |
+        docker compose up -d
+      args:
+        chdir: "{{ remnanode_dir }}"
+
+    - name: Показать логи контейнера remnanode
+      shell: |
+        docker compose logs -f -t
+      args:
+        chdir: "{{ remnanode_dir }}"
+      async: 60
+      poll: 0
+
+- import_playbook: create_remnanode.yml
+- import_playbook: playbooks/prepare_system.yml
+- import_playbook: playbooks/create_user.yml
+- import_playbook: playbooks/install_fail2ban.yml
+- import_playbook: playbooks/configure_ssh.yml
