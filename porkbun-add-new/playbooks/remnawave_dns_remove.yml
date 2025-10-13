@@ -82,23 +82,20 @@
       set_fact:
         existing_a_records_map: >-
           {%- set map = {} -%}
-          {%- for domain in domains_to_process -%}
-            {%- set records = (dns_retrieve_results.results 
-                                | selectattr('item','equalto',domain) 
-                                | first).json.records | default([]) -%}
+          {%- for r in dns_retrieve_results.results -%}
+            {%- set domain = r.item -%}
+            {%- set records = r.json.records | default([]) -%}
             {%- set a_records = records
-                                | selectattr('type','equalto','A') 
-                                | map(attribute='content') | map('trim') | list -%}
-            {%- set ids = records
-                          | selectattr('type','equalto','A') 
-                          | map(attribute='id') | list -%}
+                                | selectattr('type','equalto','A')
+                                | list -%}
             {%- set paired = [] -%}
-            {%- for i in range(a_records | length) -%}
-              {%- set _ = paired.append([a_records[i], ids[i]]) -%}
+            {%- for rec in a_records -%}
+              {%- set _ = paired.append([rec.content, rec.id]) -%}
             {%- endfor -%}
             {%- set map = map | combine({domain: paired}) -%}
           {%- endfor -%}
           {{ map }}
+
 
     # --- ШАГ 5: Построить множество активных IP ---
     - name: 🧩 Извлечь множество активных IP
