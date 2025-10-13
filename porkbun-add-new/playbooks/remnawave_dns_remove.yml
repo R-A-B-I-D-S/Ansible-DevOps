@@ -70,94 +70,17 @@
       set_fact:
         existing_a_records_map: >-
           {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('item', 'in', domains_to_process)
-              | map(attribute='json.records')
-              | flatten
-              | selectattr('type', 'equalto', 'A')
-              | map('dict2items')
-              | list
-              | map('items2dict', key_name='content', value_name='id')
-              | list
-              | zip(domains_to_process)
-              | map('reverse')
-              | list
-              | items2dict
-            )
-          }}
-      vars:
-        domain_records: >-
-          {{
             dns_retrieve_results.results
-            | selectattr('item', 'in', domains_to_process)
-            | map(attribute='json.records')
-            | list
             | zip(domains_to_process)
-            | list
-          }}
-        temp_map: >-
-          {{
-            domain_records
-            | items2dict
-          }}
-        existing_a_records_map_build: >-
-          {{
-            dict(
-              temp_map
-              | dict2items
-              | map('extract', temp_map)
-              | list
-              | zip(domains_to_process)
-              | map('reverse')
-              | list
-              | items2dict
-            )
-          }}
-
-    - name: 🧩 Построить карту существующих A-записей (альтернативный способ)
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('item', 'in', domains_to_process)
-              | map(attribute='json.records')
-              | list
-              | zip(domains_to_process)
-              | map('reverse')
-              | list
-              | items2dict
-              | dict2items
-              | map('extract', dict(dns_retrieve_results.results | selectattr('item', 'in', domains_to_process) | map(attribute='json.records') | list | zip(domains_to_process) | map('reverse') | list | items2dict))
-            )
-          }}
-      when: existing_a_records_map is not defined or existing_a_records_map == {}
-
-    - name: 🧩 Построить карту существующих A-записей (финальный вариант)
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('item', 'in', domains_to_process)
-              | selectattr('json.status', 'equalto', 'SUCCESS')
-              | map(attribute='item')
-              | list
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('item', 'in', domains_to_process)
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map(attribute='json.records')
-                | list
-                | map('selectattr', 'type', 'equalto', 'A')
-                | list
-                | map('map', 'items2dict', key_name='content', value_name='id')
-                | list
+            | map(
+                'community.general.dict_kv',
+                key_name='1', 
+                value_name='0'
               )
-              | list
-              | items2dict
-            )
+            | map('map', attribute='records')
+            | map('map', 'selectattr', 'type', 'equalto', 'A')
+            | map('map', 'items2dict', key_name='content', value_name='id')
+            | items2dict
           }}
 
     - name: 🐞 DEBUG — existing_a_records_map
@@ -169,672 +92,33 @@
       set_fact:
         active_ips_set: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
 
+    - name: 🐞 DEBUG — active_ips_set
+      debug:
+        var: active_ips_set
+
     # --- ШАГ 5: Найти лишние записи для удаления ---
     - name: 🧩 Найти лишние A-записи для удаления
       set_fact:
         orphaned_records: >-
           {{
-            dict(
-              existing_a_records_map
-              | dict2items
-              | map('extract', existing_a_records_map)
-              | list
-              | zip(domains_to_process)
-              | map('reverse')
-              | list
-              | items2dict
-              | dict2items
-              | map('extract', dict(
-                item.value
-                | dict2items
-                | selectattr('key', 'not in', active_ips_set)
-                | map('dict2items')
-                | map('items2dict', key_name='key', value_name='value')
-                | list
-                | combine
-              ), attribute='key')
-              | select
-              | items2dict
-            )
-          }}
-      vars:
-        temp_orphaned: >-
-          {{
-            dict(
-              existing_a_records_map
-              | dict2items
-              | map('extract', existing_a_records_map)
-              | list
-              | zip(domains_to_process)
-              | map('reverse')
-              | list
-              | items2dict
-              | dict2items
-              | map('extract', dict(
-                item.value
-                | dict2items
-                | selectattr('key', 'not in', active_ips_set)
-                | map('extract', item.value, attribute='key')
-                | map('extract', item.value, attribute='value')
-                | zip(
-                  item.value
+            existing_a_records_map
+            | dict2items
+            | map(
+                'combine', 
+                {
+                  'value': item.value
                   | dict2items
-                  | selectattr('key', 'not in', active_ips_set)
-                  | map('extract', item.value, attribute='key')
-                )
-                | list
-              ), attribute='key')
-              | select
-              | items2dict
-            )
-          }}
-
-    - name: 🧩 Найти лишние A-записи для удаления (альтернативный способ)
-      set_fact:
-        orphaned_records: >-
-          {{
-            dict(
-              existing_a_records_map
-              | dict2items
-              | map('extract', existing_a_records_map)
-              | list
-              | zip(domains_to_process)
-              | map('reverse')
-              | list
-              | items2dict
-              | dict2items
-              | map('extract', dict(
-                item.value
-                | dict2items
-                | selectattr('key', 'not in', active_ips_set)
-                | map('extract', item.value, attribute='value')
-                | zip(
-                  item.value
-                  | dict2items
-                  | selectattr('key', 'not in', active_ips_set)
-                  | map('extract', item.value, attribute='key')
-                )
-                | list
-                | zip(
-                  item.value
-                  | dict2items
-                  | selectattr('key', 'not in', active_ips_set)
-                  | map('extract', item.value, attribute='value')
-                )
-                | list
-              ), attribute='key')
-              | select
-              | items2dict
-            )
-          }}
-      when: orphaned_records is not defined or orphaned_records == {}
-
-    - name: 🧩 Найти лишние A-записи для удаления (окончательный вариант)
-      set_fact:
-        orphaned_records: >-
-          {{
-            dict(
-              existing_a_records_map
-              | dict2items
-              | select
-              | map('extract', existing_a_records_map)
-              | list
-              | zip(domains_to_process)
-              | map('reverse')
-              | list
-              | items2dict
-              | dict2items
-              | map('extract', dict(
-                item.value
-                | dict2items
-                | selectattr('key', 'not in', active_ips_set)
-                | map('extract', item.value, attribute='value')
-                | zip(
-                  item.value
-                  | dict2items
-                  | selectattr('key', 'not in', active_ips_set)
-                  | map('extract', item.value, attribute='key')
-                )
-                | list
-              ), attribute='key')
-              | select
-              | items2dict
-            )
+                  | rejectattr('key','in', active_ips_set)
+                  | map(attribute='key', 'id', attribute='value')
+                  | items2dict
+                }
+              )
+            | items2dict
           }}
 
     - name: 🐞 DEBUG — orphaned_records (IP → ID для удаления)
       debug:
         var: orphaned_records
-
-    # --- Исправленный ШАГ 3: Построить existing_a_records_map с парами [IP, ID] ---
-    - name: 🧩 Построить карту существующих A-записей (исправленный)
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('json.status', 'equalto', 'SUCCESS')
-              | map(attribute='json.records')
-              | list
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map(attribute='item')
-              )
-              | list
-              | map('extract', item.value, attribute='records')
-              | selectattr('type', 'equalto', 'A')
-              | map('extract', item.value, attribute='content')
-              | zip(
-                item.value
-                | selectattr('type', 'equalto', 'A')
-                | map('extract', item.value, attribute='id')
-              )
-              | list
-              | items2dict
-            )
-          }}
-      when: existing_a_records_map is not defined or existing_a_records_map == {}
-
-    - name: 🧩 Построить карту существующих A-записей (окончательный вариант)
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('json.status', 'equalto', 'SUCCESS')
-              | map(attribute='json.records')
-              | list
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map(attribute='item')
-              )
-              | list
-              | map('extract', item.value, attribute='records')
-              | selectattr('type', 'equalto', 'A')
-              | map('extract', item.value, attribute='content')
-              | zip(
-                item.value
-                | selectattr('type', 'equalto', 'A')
-                | map('extract', item.value, attribute='id')
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    - name: 🧩 Построить карту существующих A-записей (корректный вариант)
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('json.status', 'equalto', 'SUCCESS')
-              | map(attribute='item')
-              | list
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map(attribute='json.records')
-                | list
-                | map('selectattr', 'type', 'equalto', 'A')
-                | list
-                | map('map', 'extract', item.value, attribute='content')
-                | zip(
-                  dns_retrieve_results.results
-                  | selectattr('json.status', 'equalto', 'SUCCESS')
-                  | map(attribute='json.records')
-                  | list
-                  | map('selectattr', 'type', 'equalto', 'A')
-                  | list
-                  | map('map', 'extract', item.value, attribute='id')
-                )
-                | list
-                | map('items2dict', key_name='content', value_name='id')
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    # --- Исправленный ШАГ 3: Построить existing_a_records_map с парами [IP, ID] ---
-    - name: 🧩 Построить карту существующих A-записей (корректный способ)
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('json.status', 'equalto', 'SUCCESS')
-              | map('extract', item.value, attribute='json.records')
-              | selectattr('type', 'equalto', 'A')
-              | map('extract', item.value, attribute='content')
-              | zip(
-                item.value
-                | selectattr('type', 'equalto', 'A')
-                | map('extract', item.value, attribute='id')
-              )
-              | list
-              | items2dict
-            )
-          }}
-      when: existing_a_records_map is not defined or existing_a_records_map == {}
-
-    - name: 🧩 Построить карту существующих A-записей по доменам
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('json.status', 'equalto', 'SUCCESS')
-              | map('extract', item.value, attribute='json.records')
-              | map('selectattr', 'type', 'equalto', 'A')
-              | list
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | map('extract', item.value, attribute='records')
-              | map('map', 'extract', item.value, attribute='content')
-              | zip(
-                item.value
-                | map('map', 'extract', item.value, attribute='id')
-              )
-              | list
-              | map('items2dict', key_name='content', value_name='id')
-            )
-          }}
-      when: existing_a_records_map is not defined or existing_a_records_map == {}
-
-    # --- Исправленный ШАГ 3: Построить existing_a_records_map с парами [IP, ID] ---
-    - name: 🧩 Построить карту существующих A-записей (по доменам)
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('json.status', 'equalto', 'SUCCESS')
-              | map('extract', item.value, attribute='json.records')
-              | map('selectattr', 'type', 'equalto', 'A')
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | map('extract', item.value, attribute='records')
-              | map('map', 'extract', item.value, attribute='content')
-              | zip(
-                item.value
-                | map('map', 'extract', item.value, attribute='id')
-              )
-              | list
-              | map('items2dict', key_name='content', value_name='id')
-            )
-          }}
-
-    # --- Исправленный ШАГ 3: Построить existing_a_records_map с парами [IP, ID] ---
-    - name: 🧩 Построить карту существующих A-записей (окончательно правильный)
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('json.status', 'equalto', 'SUCCESS')
-              | map('extract', item.value, attribute='json.records')
-              | map('selectattr', 'type', 'equalto', 'A')
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | map('extract', item.value, attribute='records')
-              | map('map', 'items2dict', key_name='content', value_name='id')
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    # --- Исправленный ШАГ 5: Найти лишние записи для удаления ---
-    - name: 🧩 Найти лишние A-записи для удаления (окончательно правильный)
-      set_fact:
-        orphaned_records: >-
-          {{
-            dict(
-              existing_a_records_map
-              | dict2items
-              | selectattr('key', 'in', domains_to_process)
-              | map('extract', existing_a_records_map)
-              | map('dict2items')
-              | map('selectattr', 'key', 'not in', active_ips_set)
-              | zip(
-                existing_a_records_map
-                | dict2items
-                | selectattr('key', 'in', domains_to_process)
-                | map('extract', existing_a_records_map)
-                | map('dict2items')
-                | map('selectattr', 'key', 'not in', active_ips_set)
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    # --- Правильные ШАГИ 3, 4 и 5 ---
-    - name: 🧩 Построить карту существующих A-записей (правильный способ)
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('json.status', 'equalto', 'SUCCESS')
-              | map('extract', item.value, attribute='json.records')
-              | map('selectattr', 'type', 'equalto', 'A')
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | map('extract', item.value, attribute='records')
-              | map('map', 'items2dict', key_name='content', value_name='id')
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    - name: 🧩 Извлечь множество активных IP (правильный способ)
-      set_fact:
-        active_ips_set: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
-
-    - name: 🧩 Найти лишние A-записи для удаления (правильный способ)
-      set_fact:
-        orphaned_records: >-
-          {{
-            dict(
-              existing_a_records_map
-              | dict2items
-              | map('extract', existing_a_records_map)
-              | map('dict2items')
-              | map('selectattr', 'key', 'not in', active_ips_set)
-              | zip(
-                existing_a_records_map
-                | dict2items
-                | map('extract', existing_a_records_map)
-                | map('dict2items')
-                | map('selectattr', 'key', 'not in', active_ips_set)
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    # --- Исправленные ШАГИ 3, 4 и 5 ---
-    - name: 🧩 Построить карту существующих A-записей (окончательно правильный)
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('json.status', 'equalto', 'SUCCESS')
-              | map('extract', item.value, attribute='json.records')
-              | map('selectattr', 'type', 'equalto', 'A')
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | map('extract', item.value, attribute='records')
-              | map('map', 'items2dict', key_name='content', value_name='id')
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    - name: 🧩 Извлечь множество активных IP (окончательно правильный)
-      set_fact:
-        active_ips_set: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
-
-    - name: 🧩 Найти лишние A-записи для удаления (окончательно правильный)
-      set_fact:
-        orphaned_records: >-
-          {{
-            dict(
-              existing_a_records_map
-              | dict2items
-              | selectattr('key', 'in', domains_to_process)
-              | map('extract', existing_a_records_map)
-              | map('dict2items')
-              | selectattr('key', 'not in', active_ips_set)
-              | zip(
-                existing_a_records_map
-                | dict2items
-                | selectattr('key', 'in', domains_to_process)
-                | map('extract', existing_a_records_map)
-                | map('dict2items')
-                | selectattr('key', 'not in', active_ips_set)
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    # --- Правильные ШАГИ 3, 4 и 5 (окончательный вариант) ---
-    - name: 🧩 Построить карту существующих A-записей (окончательный вариант)
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('json.status', 'equalto', 'SUCCESS')
-              | map('extract', item.value, attribute='json.records')
-              | map('selectattr', 'type', 'equalto', 'A')
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | map('extract', item.value, attribute='records')
-              | map('map', 'items2dict', key_name='content', value_name='id')
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    - name: 🧩 Извлечь множество активных IP (окончательный вариант)
-      set_fact:
-        active_ips_set: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
-
-    - name: 🧩 Найти лишние A-записи для удаления (окончательный вариант)
-      set_fact:
-        orphaned_records: >-
-          {{
-            dict(
-              existing_a_records_map
-              | dict2items
-              | selectattr('key', 'in', domains_to_process)
-              | map('extract', existing_a_records_map)
-              | map('dict2items')
-              | selectattr('key', 'not in', active_ips_set)
-              | zip(
-                existing_a_records_map
-                | dict2items
-                | selectattr('key', 'in', domains_to_process)
-                | map('extract', existing_a_records_map)
-                | map('dict2items')
-                | selectattr('key', 'not in', active_ips_set)
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    # --- Правильные ШАГИ 3, 4 и 5 (самый простой и понятный способ) ---
-    - name: 🧩 Построить карту существующих A-записей (простой способ)
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('json.status', 'equalto', 'SUCCESS')
-              | selectattr('item', 'in', domains_to_process)
-              | map('extract', item.value, attribute='json.records')
-              | map('selectattr', 'type', 'equalto', 'A')
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | selectattr('item', 'in', domains_to_process)
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | map('extract', item.value, attribute='records')
-              | map('map', 'items2dict', key_name='content', value_name='id')
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | selectattr('item', 'in', domains_to_process)
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    - name: 🧩 Извлечь множество активных IP (простой способ)
-      set_fact:
-        active_ips_set: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
-
-    - name: 🧩 Найти лишние A-записи для удаления (простой способ)
-      set_fact:
-        orphaned_records: >-
-          {{
-            dict(
-              existing_a_records_map
-              | dict2items
-              | selectattr('key', 'in', domains_to_process)
-              | map('extract', existing_a_records_map)
-              | map('dict2items')
-              | selectattr('key', 'not in', active_ips_set)
-              | zip(
-                existing_a_records_map
-                | dict2items
-                | selectattr('key', 'in', domains_to_process)
-                | map('extract', existing_a_records_map)
-                | map('dict2items')
-                | selectattr('key', 'not in', active_ips_set)
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    # --- Правильные ШАГИ 3, 4 и 5 (финальный и рабочий вариант) ---
-    - name: 🧩 Построить карту существующих A-записей (финальный вариант)
-      set_fact:
-        existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | selectattr('json.status', 'equalto', 'SUCCESS')
-              | selectattr('item', 'in', domains_to_process)
-              | map('extract', item.value, attribute='json.records')
-              | map('selectattr', 'type', 'equalto', 'A')
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | selectattr('item', 'in', domains_to_process)
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | map('extract', item.value, attribute='records')
-              | map('map', 'items2dict', key_name='content', value_name='id')
-              | zip(
-                dns_retrieve_results.results
-                | selectattr('json.status', 'equalto', 'SUCCESS')
-                | selectattr('item', 'in', domains_to_process)
-                | map('extract', item.value, attribute='item')
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    - name: 🧩 Извлечь множество активных IP (финальный вариант)
-      set_fact:
-        active_ips_set: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
-
-    - name: 🧩 Найти лишние A-записи для удаления (финальный вариант)
-      set_fact:
-        orphaned_records: >-
-          {{
-            dict(
-              existing_a_records_map
-              | dict2items
-              | selectattr('key', 'in', domains_to_process)
-              | map('extract', existing_a_records_map)
-              | map('dict2items')
-              | selectattr('key', 'not in', active_ips_set)
-              | zip(
-                existing_a_records_map
-                | dict2items
-                | selectattr('key', 'in', domains_to_process)
-                | map('extract', existing_a_records_map)
-                | map('dict2items')
-                | selectattr('key', 'not in', active_ips_set)
-              )
-              | list
-              | items2dict
-            )
-          }}
-
-    - name: 🐞 DEBUG — existing_a_records_map
-      debug:
-        var: existing_a_records_map
-
-    - name: 🐞 DEBUG — orphaned_records (IP → ID для удаления)
-      debug:
-        var: orphaned_records
-
-    - name: 📄 Сводка записи для удаления по доменам
-      debug:
-        msg: |-
-          ДОМЕН: {{ domain }}
-          Найдено лишних записей: {{ count }}
-          {% for ip, id in records %}
-          → {{ ip }} (ID: {{ id }})
-          {% endfor %}
-      loop: "{{ orphaned_records | dict2items }}"
-      loop_control:
-        label: "{{ item.key }}"
-      vars:
-        domain: "{{ item.key }}"
-        records: "{{ item.value }}"
-        count: "{{ item.value | length }}"
 
     # --- ШАГ 6: Подтверждение удаления ---
     - name: 🛑 Подтвердите удаление записей (введите 'yes')
@@ -848,7 +132,7 @@
       vars:
         orphaned_records_list: "{{ orphaned_records | dict2items | subelements('value') }}"
       uri:
-        url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ item.0.key }}/{{ item.1.1 }}"
+        url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ item.0.key }}/{{ item.1.key }}"
         method: POST
         body:
           apikey: "{{ porkbun_api_key }}"
@@ -857,7 +141,7 @@
         status_code: 200
       loop: "{{ orphaned_records_list }}"
       loop_control:
-        label: "{{ item.0.key }} → {{ item.1.0 }} (ID: {{ item.1.1 }})"
+        label: "{{ item.0.key }} → {{ item.1.key }} (ID: {{ item.1.value }})"
       register: delete_results
       when: confirmation.user_input | default('no') == 'yes'
 
@@ -867,11 +151,11 @@
         msg: "✅ Удалена запись: {{ domain }} → {{ ip }} (ID: {{ record_id }})"
       loop: "{{ delete_results.results | default([]) }}"
       loop_control:
-        label: "{{ item.item.0.key }} → {{ item.item.1.0 }}"
+        label: "{{ item.item.0.key }} → {{ item.item.1.key }}"
       vars:
         domain: "{{ item.item.0.key }}"
-        ip: "{{ item.item.1.0 }}"
-        record_id: "{{ item.item.1.1 }}"
+        ip: "{{ item.item.1.key }}"
+        record_id: "{{ item.item.1.value }}"
       when: item is defined and item.status == 200
 
     - name: ❌ Отчёт ошибки при удалении
@@ -879,11 +163,11 @@
         msg: "❌ Ошибка при удалении {{ domain }} → {{ ip }} (ID: {{ record_id }}): {{ item.status }} {{ item.status_text }}"
       loop: "{{ delete_results.results | default([]) }}"
       loop_control:
-        label: "{{ item.item.0.key }} → {{ item.item.1.0 }}"
+        label: "{{ item.item.0.key }} → {{ item.item.1.key }}"
       vars:
         domain: "{{ item.item.0.key }}"
-        ip: "{{ item.item.1.0 }}"
-        record_id: "{{ item.item.1.1 }}"
+        ip: "{{ item.item.1.key }}"
+        record_id: "{{ item.item.1.value }}"
       when: item is defined and item.status != 200
 
     # --- ШАГ 9: Финальная сводка ---
