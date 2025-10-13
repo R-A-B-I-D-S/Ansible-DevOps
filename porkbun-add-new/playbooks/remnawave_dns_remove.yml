@@ -65,30 +65,23 @@
       loop_control:
         label: "{{ item }}"
 
-    # --- ШАГ 3: Построить existing_a_records_map ---
+    - name: 🐞 DEBUG — Проверка полученных записей
+      debug:
+        var: dns_retrieve_results.results
+
+    # --- ШАГ 3: Построить existing_a_records_map с парами [IP, ID] ---
     - name: 🧩 Построить карту существующих A-записей
       set_fact:
         existing_a_records_map: >-
-          {{
-            dict(
-              dns_retrieve_results.results
-              | map(attribute='item')
-              | zip(
-                  dns_retrieve_results.results
-                  | map(attribute='json')
-                  | map(attribute='records')
-                  | map('selectattr', 'type', 'equalto', 'A')
-                  | map('map', attribute='content')
-                  | zip(
-                      dns_retrieve_results.results
-                      | map(attribute='json')
-                      | map(attribute='records')
-                      | map('selectattr', 'type', 'equalto', 'A')
-                      | map('map', attribute='id')
-                  )
-              )
-            )
-          }}
+          {%- set map = {} -%}
+          {%- for r in dns_retrieve_results.results -%}
+            {%- set a_records = [] -%}
+            {%- for rec in r.json.records | selectattr('type', 'equalto', 'A') -%}
+              {%- set _ = a_records.append([rec.content, rec.id]) -%}
+            {%- endfor -%}
+            {%- set map = map | combine({r.item: a_records}) -%}
+          {%- endfor -%}
+          {{ map }}
 
     - name: 🐞 DEBUG — existing_a_records_map
       debug:
