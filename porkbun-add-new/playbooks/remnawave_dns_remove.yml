@@ -135,19 +135,14 @@
           secretapikey: "{{ porkbun_secret_api_key }}"
         body_format: json
         status_code: 200
-      loop: "{{ domains_to_process | product([0]) | list }}"  # Заглушка для внешнего цикла
-      loop_control:
-        loop_var: dummy
-      vars:
-        domain: "{{ dummy.0 }}"
-        records_to_delete: "{{ ips_to_delete_map[domain] | default([]) }}"
-      when: records_to_delete | length > 0
-      loop_control:
-        extended: yes
-      register: delete_results
-      with_items: "{{ records_to_delete }}"
+      loop: "{{ domains_to_process | map('extract', ips_to_delete_map) | list | flatten(1) }}"
       loop_control:
         loop_var: record
+      vars:
+        domain: "{{ record.name }}"
+      when: ips_to_delete_map | length > 0
+      register: delete_results
+
 
     # --- ШАГ 7: Уведомление о результатах ---
     - name: ✅ Удаление завершено — сводка по доменам
