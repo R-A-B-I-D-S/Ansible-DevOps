@@ -3,7 +3,7 @@
   hosts: all
   become: yes
   vars:
-    base_dir: "/etc/ansible/remnawave/remnanode"
+    base_dir: "./"
     working_dir: "/opt/caddy"
 
   tasks:
