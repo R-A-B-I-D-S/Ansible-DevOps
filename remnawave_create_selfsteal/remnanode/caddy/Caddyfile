@@ -6,7 +6,6 @@
         key_prefix caddy_
         db 0
     }
-    auto_https off
 }
 
 my-rebar.shop:80 {
