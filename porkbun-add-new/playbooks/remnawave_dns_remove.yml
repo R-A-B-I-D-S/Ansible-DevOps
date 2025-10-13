@@ -70,17 +70,16 @@
       set_fact:
         existing_a_records_map: >-
           {{
-            dns_retrieve_results.results
-            | zip(domains_to_process)
-            | map(
-                'community.general.dict_kv',
-                key_name='1', 
-                value_name='0'
-              )
-            | map('map', attribute='records')
-            | map('map', 'selectattr', 'type', 'equalto', 'A')
-            | map('map', 'items2dict', key_name='content', value_name='id')
-            | items2dict
+            dict(
+              dns_retrieve_results.results
+              | zip(domains_to_process)
+              | map('extract', 1)  # домен
+              | zip(dns_retrieve_results.results)
+              | map('map', lambda x: (x[0], 
+                    dict((r.content, r.id) for r in x[1].json.records if r.type == 'A')
+                  ))
+              | list
+            )
           }}
 
     - name: 🐞 DEBUG — existing_a_records_map
@@ -101,24 +100,18 @@
       set_fact:
         orphaned_records: >-
           {{
-            existing_a_records_map
-            | dict2items
-            | map(
-                'combine', 
-                {
-                  'value': item.value
-                  | dict2items
-                  | rejectattr('key','in', active_ips_set)
-                  | map(attribute='key', 'id', attribute='value')
-                  | items2dict
-                }
-              )
-            | items2dict
+            dict(
+              existing_a_records_map
+              | dict2items
+              | map('combine', {'value': (item.value | dict2items | rejectattr('key','in',active_ips_set) | items2dict)})
+              | items2dict
+            )
           }}
 
     - name: 🐞 DEBUG — orphaned_records (IP → ID для удаления)
       debug:
         var: orphaned_records
+
 
     # --- ШАГ 6: Подтверждение удаления ---
     - name: 🛑 Подтвердите удаление записей (введите 'yes')
