@@ -76,7 +76,7 @@
                 | default([])
                 | selectattr('type', 'equalto', 'A')
                 | selectattr('name', 'equalto', item)
-                | map(attribute='content')
+                | map('extract', attribute='content')
                 | zip(
                     (dns_retrieve_results.results | selectattr('item', 'equalto', item) | first).json.records
                     | default([])
@@ -92,10 +92,6 @@
       loop_control:
         label: "{{ item }}"
 
-    - name: 🐞 DEBUG — existing_a_records_map
-      debug:
-        var: existing_a_records_map
-
     # --- ШАГ 4: Построить множество активных IP ---
     - name: 🧩 Извлечь множество активных IP
       set_fact:
@@ -109,7 +105,7 @@
             orphaned_records | default({}) | combine({
               domain: (
                 existing_a_records_map[domain]
-                | selectattr('0', 'notin', active_ips_set)
+                | rejectattr('0', 'in', active_ips_set)  # '0' — это IP в паре [IP, ID]
                 | list
               )
             })
@@ -117,10 +113,6 @@
       loop: "{{ domains_to_process }}"
       loop_control:
         loop_var: domain
-
-    - name: 🐞 DEBUG — orphaned_records (IP → ID для удаления)
-      debug:
-        var: orphaned_records
 
     # --- ШАГ 6: Сводка записи для удаления по доменам ---
     - name: 📄 Сводка записи для удаления по доменам
