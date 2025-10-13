@@ -66,18 +66,23 @@
         label: "{{ item }}"
 
     # --- ШАГ 3: Построить карту существующих A-записей ---
-    - name: 🧩 Построить карту существующих A-записей
+    - name: 🧩 Построить карту существующих A-записей (корректно для Ansible)
       set_fact:
         existing_a_records_map: >-
           {{
             dict(
-              (item.item, dict(
-                (r.content, r.id)
-                for r in item.result.json.records
-                if r.type == 'A'
-              )) for item in dns_retrieve_results.results | zip(domains_to_process) | map('flatten') | list
+              dns_retrieve_results.results | map(attribute='item') 
+              | zip(
+                  dns_retrieve_results.results 
+                  | map(attribute='result') 
+                  | map(attribute='json') 
+                  | map(attribute='records') 
+                  | map('selectattr', 'type', 'equalto', 'A') 
+                  | map('items2dict', key_name='content', value_name='id')
+                )
             )
           }}
+
 
     - name: 🐞 DEBUG — existing_a_records_map
       debug:
