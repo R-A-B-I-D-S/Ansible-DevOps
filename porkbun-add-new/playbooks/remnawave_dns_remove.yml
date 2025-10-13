@@ -4,7 +4,13 @@
   gather_facts: no
 
   vars:
-    domains_to_process: "{{ target_domains }}"
+    target_domains:
+      - my-rebar.shop
+      - mos-drywall.shop
+    remnawave_domain: "remnawave.example.com"  # Укажите реальный адрес API Remnawave
+    remnawave_token: "your-remnawave-api-token"  # Замените на ваш токен
+    porkbun_api_key: "your-porkbun-api-key"    # Замените на ваш API-ключ Porkbun
+    porkbun_secret_api_key: "your-porkbun-secret-key"  # Замените на ваш секретный ключ
 
   tasks:
 
@@ -61,65 +67,81 @@
         body_format: json
         return_content: yes
       register: dns_retrieve_results
-      loop: "{{ domains_to_process }}"
+      loop: "{{ target_domains }}"
       loop_control:
         label: "{{ item }}"
 
-    # --- ШАГ 3: Построить existing_a_records_map с парами [IP, ID] ---
+    # --- ШАГ 3: Построить карту существующих A-записей ---
     - name: 🧩 Построить карту существующих A-записей
       set_fact:
         existing_a_records_map: >-
-          {%- set map = {} -%}
-          {%- for r in dns_retrieve_results.results -%}
-            {%- set records = r.json.records | default([]) -%}
-            {%- set a_records = [] -%}
-            {%- for rec in records -%}
-              {%- if rec.type == 'A' -%}
-                {%- set _ = a_records.append([rec.content, rec.id]) -%}
-              {%- endif -%}
-            {%- endfor -%}
-            {%- set map = map | combine({ r.item: a_records }) -%}
-          {%- endfor -%}
-          {{ map }}
-
+          {{
+            (dns_retrieve_results.results | 
+             map(attribute='json.records') | 
+             map('list') | 
+             list | 
+             flatten | 
+             selectattr('type', 'eq', 'A') | 
+             map(attribute='content') | 
+             list | 
+             zip(dns_retrieve_results.results | 
+                 map(attribute='json.records') | 
+                 map('list') | 
+                 list | 
+                 flatten | 
+                 selectattr('type', 'eq', 'A') | 
+                 map(attribute='id') | 
+                 list) | 
+             from_dict(key_name='content', value_name='id')
+          }}
 
     - name: 🐞 DEBUG — existing_a_records_map
       debug:
         var: existing_a_records_map
 
-   # --- ШАГ 4: Построить множество активных IP ---
+    # --- ШАГ 4: Построить множество активных IP ---
     - name: 🧩 Извлечь множество активных IP
       set_fact:
         active_ips_set: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
-    
-    # --- ШАГ 5: Найти лишние записи для удаления ---
+
+    # --- ШАГ 5: Найти лишние A-записи для удаления ---
     - name: 🧩 Найти лишние A-записи для удаления
       set_fact:
         orphaned_records: >-
           {{
-            dict(
-              domains_to_process | zip(
-                dns_retrieve_results.results
-                | map(attribute='json.records')
-                | map('selectattr', 'type', 'equalto', 'A')
-                | map('selectattr', 'content', 'not in', active_ips_set)
-                | map('map', 'dict', 'ip', 'content', 'id', 'id')
-                | map('list')
-              )
-            )
+            (dns_retrieve_results.results | 
+             map(attribute='json.records') | 
+             map('list') | 
+             list | 
+             flatten | 
+             selectattr('type', 'eq', 'A') | 
+             selectattr('content', 'not in', active_ips_set) | 
+             map(attribute='content') | 
+             list | 
+             zip(dns_retrieve_results.results | 
+                 map(attribute='json.records') | 
+                 map('list') | 
+                 list | 
+                 flatten | 
+                 selectattr('type', 'eq', 'A') | 
+                 selectattr('content', 'not in', active_ips_set) | 
+                 map(attribute='id') | 
+                 list) | 
+             from_dict(key_name='content', value_name='id')
           }}
 
     - name: 🐞 DEBUG — orphaned_records (IP → ID для удаления)
       debug:
         var: orphaned_records
 
+    # --- ШАГ 6: Сводка записей для удаления по доменам ---
     - name: 📄 Сводка записи для удаления по доменам
       debug:
         msg: |-
           ДОМЕН: {{ domain }}
           Найдено лишних записей: {{ count }}
-          {% for ip, id in records %}
-          → {{ ip }} (ID: {{ id }})
+          {% for ip, record_id in records %}
+          → {{ ip }} (ID: {{ record_id }})
           {% endfor %}
       loop: "{{ orphaned_records | dict2items }}"
       loop_control:
@@ -129,17 +151,15 @@
         records: "{{ item.value }}"
         count: "{{ item.value | length }}"
 
-    # --- ШАГ 6: Подтверждение удаления ---
+    # --- ШАГ 7: Подтверждение удаления ---
     - name: 🛑 Подтвердите удаление записей (введите 'yes')
       pause:
-        prompt: "⚠️ Будет удалено {{ orphaned_records | dict2items | map(attribute='value') | sum(attribute='|length') | sum }} записей. Введите 'yes' для подтверждения, или Ctrl+C для отмены"
+        prompt: "⚠️ Будет удалено {{ orphaned_records | dict2items | map(attribute='value') | sum(attribute='|length') }} записей. Введите 'yes' для подтверждения, или Ctrl+C для отмены"
       register: confirmation
       when: orphaned_records | length > 0
 
-    # --- ШАГ 7: Удаление A-записей через Porkbun ---
+    # --- ШАГ 8: Удаление A-записей через Porkbun ---
     - name: 🗑️ Удаляем A-записи неактивных нод
-      vars:
-        orphaned_records_list: "{{ orphaned_records | dict2items | subelements('value') }}"
       uri:
         url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ item.0.key }}/{{ item.1.1 }}"
         method: POST
@@ -148,13 +168,13 @@
           secretapikey: "{{ porkbun_secret_api_key }}"
         body_format: json
         status_code: 200
-      loop: "{{ orphaned_records_list }}"
+      loop: "{{ orphaned_records | dict2items | subelements('value') }}"
       loop_control:
         label: "{{ item.0.key }} → {{ item.1.0 }} (ID: {{ item.1.1 }})"
       register: delete_results
       when: confirmation.user_input | default('no') == 'yes'
 
-    # --- ШАГ 8: Отчёт успешных удалений ---
+    # --- ШАГ 9: Отчёт успешных удалений ---
     - name: ✅ Отчёт успешные удаления
       debug:
         msg: "✅ Удалена запись: {{ domain }} → {{ ip }} (ID: {{ record_id }})"
@@ -167,6 +187,7 @@
         record_id: "{{ item.item.1.1 }}"
       when: item is defined and item.status == 200
 
+    # --- ШАГ 10: Отчёт ошибок при удалении ---
     - name: ❌ Отчёт ошибки при удалении
       debug:
         msg: "❌ Ошибка при удалении {{ domain }} → {{ ip }} (ID: {{ record_id }}): {{ item.status }} {{ item.status_text }}"
@@ -179,9 +200,20 @@
         record_id: "{{ item.item.1.1 }}"
       when: item is defined and item.status != 200
 
-    # --- ШАГ 9: Финальная сводка ---
+    # --- ШАГ 11: Финальный отчёт ---
     - name: 📊 Финальный отчёт — что было сделано
       debug:
         msg: |
           {% set total_deleted = (delete_results.results | default([]) | selectattr('status','equalto',200) | list | length) %}
           Всего удалено: {{ total_deleted }}
+          {% if orphaned_records | length > 0 %}
+          Список лишних записей:
+          {% for domain, records in orphaned_records | dict2items %}
+          {{ domain }}:
+          {% for ip, record_id in records | dict2items %}
+          - {{ ip }} (ID: {{ record_id }})
+          {% endfor %}
+          {% endfor %}
+          {% else %}
+          Действий не требуется.
+          {% endif %}
