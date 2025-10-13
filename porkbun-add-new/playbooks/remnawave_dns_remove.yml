@@ -50,7 +50,7 @@
         msg: "Нет активных нод в Remnawave. Удалять нечего."
       when: active_nodes | length == 0
 
-    # --- ШАГ 2: Получить все DNS-записи для доменов ---
+    # --- ШАГ 2: Получить все DNS-записи для домена ---
     - name: 🔍 Получить все DNS-записи для домена
       uri:
         url: "https://api.porkbun.com/api/json/v3/dns/retrieve/{{ item }}"
@@ -65,24 +65,32 @@
       loop_control:
         label: "{{ item }}"
 
-    # --- ШАГ 3: Построить карту существующих A-записей ---
-    - name: 🧩 Построить карту существующих A-записей (корректно для Ansible)
+    # --- ШАГ 3: Построить карту существующих A-записей (IP → ID) ---
+    - name: 🧩 Построить карту существующих A-записей
       set_fact:
         existing_a_records_map: >-
           {{
-            dict(
-              dns_retrieve_results.results | map(attribute='item') 
-              | zip(
-                  dns_retrieve_results.results 
-                  | map(attribute='result') 
-                  | map(attribute='json') 
-                  | map(attribute='records') 
-                  | map('selectattr', 'type', 'equalto', 'A') 
-                  | map('items2dict', key_name='content', value_name='id')
-                )
-            )
+            existing_a_records_map | default({}) | combine({
+              item: (
+                (dns_retrieve_results.results | selectattr('item', 'equalto', item) | first).json.records
+                | default([])
+                | selectattr('type', 'equalto', 'A')
+                | selectattr('name', 'equalto', item)
+                | map(attribute='content')
+                | zip(
+                    (dns_retrieve_results.results | selectattr('item', 'equalto', item) | first).json.records
+                    | default([])
+                    | selectattr('type', 'equalto', 'A')
+                    | selectattr('name', 'equalto', item)
+                    | map(attribute='id')
+                  )
+                | list
+              )
+            })
           }}
-
+      loop: "{{ domains_to_process }}"
+      loop_control:
+        label: "{{ item }}"
 
     - name: 🐞 DEBUG — existing_a_records_map
       debug:
@@ -93,32 +101,34 @@
       set_fact:
         active_ips_set: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
 
-    - name: 🐞 DEBUG — active_ips_set
-      debug:
-        var: active_ips_set
-
-    # --- ШАГ 5: Найти лишние A-записи для удаления ---
+    # --- ШАГ 5: Найти лишние записи для удаления ---
     - name: 🧩 Найти лишние A-записи для удаления
       set_fact:
         orphaned_records: >-
           {{
-            dict(
-              (domain, existing_a_records_map[domain] | dict2items | selectattr('key','not in', active_ips_set) | items2dict)
-              for domain in existing_a_records_map
-            )
+            orphaned_records | default({}) | combine({
+              domain: (
+                existing_a_records_map[domain]
+                | selectattr('0', 'notin', active_ips_set)
+                | list
+              )
+            })
           }}
+      loop: "{{ domains_to_process }}"
+      loop_control:
+        loop_var: domain
 
     - name: 🐞 DEBUG — orphaned_records (IP → ID для удаления)
       debug:
         var: orphaned_records
 
-    # --- ШАГ 6: Сводка записей для удаления ---
+    # --- ШАГ 6: Сводка записи для удаления по доменам ---
     - name: 📄 Сводка записи для удаления по доменам
       debug:
         msg: |-
           ДОМЕН: {{ domain }}
-          Найдено лишних записей: {{ count }}
-          {% for ip, id in records.items() %}
+          Найдено лишних записей: {{ records | length }}
+          {% for ip, id in records %}
           → {{ ip }} (ID: {{ id }})
           {% endfor %}
       loop: "{{ orphaned_records | dict2items }}"
@@ -127,8 +137,6 @@
       vars:
         domain: "{{ item.key }}"
         records: "{{ item.value }}"
-        count: "{{ item.value | length }}"
-      when: item.value | length > 0
 
     # --- ШАГ 7: Подтверждение удаления ---
     - name: 🛑 Подтвердите удаление записей (введите 'yes')
@@ -142,7 +150,7 @@
       vars:
         orphaned_records_list: "{{ orphaned_records | dict2items | subelements('value') }}"
       uri:
-        url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ item.0.key }}/{{ item.1.key }}"
+        url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ item.0.key }}/{{ item.1.1 }}"
         method: POST
         body:
           apikey: "{{ porkbun_api_key }}"
@@ -151,7 +159,7 @@
         status_code: 200
       loop: "{{ orphaned_records_list }}"
       loop_control:
-        label: "{{ item.0.key }} → {{ item.1.key }} (ID: {{ item.1.value }})"
+        label: "{{ item.0.key }} → {{ item.1.0 }} (ID: {{ item.1.1 }})"
       register: delete_results
       when: confirmation.user_input | default('no') == 'yes'
 
@@ -161,11 +169,11 @@
         msg: "✅ Удалена запись: {{ domain }} → {{ ip }} (ID: {{ record_id }})"
       loop: "{{ delete_results.results | default([]) }}"
       loop_control:
-        label: "{{ item.item.0.key }} → {{ item.item.1.key }}"
+        label: "{{ item.item.0.key }} → {{ item.item.1.0 }}"
       vars:
         domain: "{{ item.item.0.key }}"
-        ip: "{{ item.item.1.key }}"
-        record_id: "{{ item.item.1.value }}"
+        ip: "{{ item.item.1.0 }}"
+        record_id: "{{ item.item.1.1 }}"
       when: item is defined and item.status == 200
 
     - name: ❌ Отчёт ошибки при удалении
@@ -173,11 +181,11 @@
         msg: "❌ Ошибка при удалении {{ domain }} → {{ ip }} (ID: {{ record_id }}): {{ item.status }} {{ item.status_text }}"
       loop: "{{ delete_results.results | default([]) }}"
       loop_control:
-        label: "{{ item.item.0.key }} → {{ item.item.1.key }}"
+        label: "{{ item.item.0.key }} → {{ item.item.1.0 }}"
       vars:
         domain: "{{ item.item.0.key }}"
-        ip: "{{ item.item.1.key }}"
-        record_id: "{{ item.item.1.value }}"
+        ip: "{{ item.item.1.0 }}"
+        record_id: "{{ item.item.1.1 }}"
       when: item is defined and item.status != 200
 
     # --- ШАГ 10: Финальная сводка ---
