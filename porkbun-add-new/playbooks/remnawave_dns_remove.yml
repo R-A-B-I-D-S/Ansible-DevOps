@@ -71,13 +71,17 @@
         existing_a_records_map: >-
           {%- set map = {} -%}
           {%- for r in dns_retrieve_results.results -%}
+            {%- set records = r.json.records | default([]) -%}
             {%- set a_records = [] -%}
-            {%- for rec in r.json.records | selectattr('type', 'equalto', 'A') -%}
-              {%- set _ = a_records.append([rec.content, rec.id]) -%}
+            {%- for rec in records -%}
+              {%- if rec.type == 'A' -%}
+                {%- set _ = a_records.append([rec.content, rec.id]) -%}
+              {%- endif -%}
             {%- endfor -%}
-            {%- set map = map | combine({r.item: a_records}) -%}
+            {%- set map = map | combine({ r.item: a_records }) -%}
           {%- endfor -%}
           {{ map }}
+
 
     - name: 🐞 DEBUG — existing_a_records_map
       debug:
