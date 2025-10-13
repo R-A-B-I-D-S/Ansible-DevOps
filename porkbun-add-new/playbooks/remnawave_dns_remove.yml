@@ -73,7 +73,7 @@
             dict(
               dns_retrieve_results.results
               | zip(domains_to_process)
-              | map('extract', 1)  # домен
+              | map('extract', 1)
               | zip(dns_retrieve_results.results)
               | map('map', lambda x: (x[0], 
                     dict((r.content, r.id) for r in x[1].json.records if r.type == 'A')
