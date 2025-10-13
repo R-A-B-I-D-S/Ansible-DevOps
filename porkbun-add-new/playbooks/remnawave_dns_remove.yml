@@ -1,5 +1,5 @@
 ---
-- name: ❌ Удалить A-записи неактивных нод
+- name: 🗑️ Удалить A-записи для неактивных нод Remnawave из DNS Porkbun
   hosts: localhost
   gather_facts: no
 
@@ -8,38 +8,50 @@
 
   tasks:
 
-    # --- ШАГ 1: Получить список всех нод из Remnawave ---
-    - name: 🌐 Получить все ноды из Remnawave
+    # --- ШАГ 1: Получить активные ноды из Remnawave API ---
+    - name: 🌐 Получить активные ноды из Remnawave
       uri:
-        url: "https://{{ remnawave_domain }}/api/nodes"
+        url: "https://{{ remnawave_domail }}/api/nodes"
         method: GET
         headers:
           Authorization: "Bearer {{ remnawave_token }}"
         return_content: yes
+        timeout: 30
       register: remnawave_response
+      until: remnawave_response.status == 200
+      retries: 3
+      delay: 5
 
     - name: ❌ Проверить ошибку Remnawave API
       fail:
         msg: "Remnawave API вернул ошибку: {{ remnawave_response.json.message | default('Unknown error') }}"
       when: remnawave_response.json is defined and remnawave_response.json.errorCode is defined
 
-    - name: 🧩 Извлечь активные ноды
+    - name: 🧩 Извлечь активные ноды (isNodeOnline == true)
       set_fact:
         active_nodes: >-
           {{
             remnawave_response.json.response
             | selectattr('isNodeOnline', 'equalto', true)
-            | map(attribute='address')
-            | map('trim')
             | list
           }}
 
-    - name: 📄 Вывести активные ноды
+    - name: 📄 Вывести список активных нод
       debug:
-        msg: "Активные ноды: {{ active_nodes }}"
+        msg: |-
+          АКТИВНЫЕ НОДЫ ({{ active_nodes | length }} шт.):
+          {% for node in active_nodes %}
+          {{ "%2d" % loop.index }}) {{ node.name }} → {{ node.address }}
+          {% endfor %}
+      when: active_nodes | length > 0
 
-    # --- ШАГ 2: Получить DNS-записи для домена ---
-    - name: 🔍 Получить DNS-записи домена
+    - name: 🟡 Нет активных нод — пропускаем DNS-операции
+      debug:
+        msg: "Нет активных нод в Remnawave. Удалять нечего."
+      when: active_nodes | length == 0
+
+    # --- ШАГ 2: Получить все DNS-записи для домена ---
+    - name: 🔍 Получить все DNS-записи для домена
       uri:
         url: "https://api.porkbun.com/api/json/v3/dns/retrieve/{{ item }}"
         method: POST
@@ -49,96 +61,148 @@
         body_format: json
         return_content: yes
       register: dns_retrieve_results
+      ignore_errors: yes
       loop: "{{ domains_to_process }}"
       loop_control:
         label: "{{ item }}"
 
-    - name: ❌ Проверить ошибки Porkbun API
+    # --- ШАГ 3: Проверить ошибки Porkbun API ---
+    - name: ❌ Проверить ошибку Porkbun API для домена
       fail:
-        msg: "Ошибка Porkbun для {{ item }}: {{ result.json.message | default('Unknown') }}"
+        msg: "Porkbun API error for {{ item }}: {{ result.json.message | default('Unknown') }}"
+      when: result.json is defined and result.json.status != "SUCCESS"
       loop: "{{ domains_to_process }}"
       loop_control:
         label: "{{ item }}"
       vars:
         result: "{{ dns_retrieve_results.results | selectattr('item', 'equalto', item) | first }}"
-      when: result.json is defined and result.json.status != "SUCCESS"
 
-    # --- ШАГ 3: Найти A-записи неактивных нод ---
-    - name: 🧩 Определить A-записи неактивных нод
+    # --- ШАГ 4: Построить existing_a_records_map (только A-записи apex-домена) ---
+    - name: 🧩 Построить existing_a_records_map
       set_fact:
-        inactive_records: >-
-          {{
-            inactive_records | default([]) + (
-              (dns_retrieve_results.results | selectattr('item', 'equalto', domain) | first).json.records
-              | selectattr('type', 'equalto', 'A')
-              | selectattr('name', 'equalto', domain)
-              | rejectattr('content', 'in', active_nodes)
-              | list
-            )
-          }}
-      loop: "{{ domains_to_process }}"
-      loop_control:
-        label: "{{ item }}"
-      vars:
-        domain: "{{ item }}"
+        existing_a_records_map: >-
+          {%- set map = {} -%}
+          {%- for domain in domains_to_process -%}
+            {%- set records = (dns_retrieve_results.results 
+                                | selectattr('item','equalto',domain) 
+                                | first).json.records | default([]) -%}
+            {%- set a_records = records 
+                                | selectattr('type','equalto','A') 
+                                | selectattr('name','equalto',domain) 
+                                | map(attribute='content') | map('trim') | list -%}
+            {%- set ids = records 
+                        | selectattr('type','equalto','A') 
+                        | selectattr('name','equalto',domain) 
+                        | map(attribute='id') | list -%}
+            {%- set map = map | combine({domain: a_records | zip(ids) | map('list') | list}) -%}
+          {%- endfor -%}
+          {{ map }}
 
-    - name: 📄 Вывести A-записи неактивных нод
+    # --- ШАГ 5: Построить множество активных IP ---
+    - name: 🧩 Извлечь множество активных IP
+      set_fact:
+        active_ips_set: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
+
+    # --- ШАГ 6: Найти лишние записи для удаления ---
+    - name: 🧩 Найти лишние A-записи для удаления
+      set_fact:
+        orphaned_records: >-
+          {%- set orphans = {} -%}
+          {%- for domain in domains_to_process -%}
+            {%- set records = existing_a_records_map[domain] | default([]) -%}
+            {%- set to_delete = records | rejectattr(0,'in',active_ips_set) | list -%}
+            {%- set orphans = orphans | combine({domain: to_delete}) -%}
+          {%- endfor -%}
+          {{ orphans }}
+
+    # --- ДЕБАГ: orphaned_records ---
+    - name: 🐞 DEBUG — orphaned_records (IP → ID для удаления)
       debug:
-        msg: "Для домена {{ item }} будут удалены: {{ inactive_records }}"
-      loop: "{{ domains_to_process }}"
-      loop_control:
-        label: "{{ item }}"
-      vars:
-        inactive_records: "{{ inactive_records | selectattr('name', 'equalto', item) | list }}"
+        var: orphaned_records
 
-    - name: 🗑️ Удалить A-записи неактивных нод через Porkbun
-      vars:
-        domain_inactive_records: >-
-          {{
-            (dns_retrieve_results.results | selectattr('item', 'equalto', domain) | first).json.records
-            | selectattr('type', 'equalto', 'A')
-            | rejectattr('content', 'in', active_nodes)
-            | list
-          }}
-      loop: "{{ domains_to_process }}"
-      loop_control:
-        loop_var: domain
-      when: domain_inactive_records | length > 0
-      block:
-
-    - name: 📄 Удаляем записи для домена {{ domain }}
+    # --- ШАГ 7: Сводка по доменам ---
+    - name: 📄 Сводка записи для удаления по доменам
       debug:
-        msg: "Удаляем {{ item.content }} (ID {{ item.id }})"
-      loop: "{{ domain_inactive_records }}"
+        msg: |-
+          ДОМЕН: {{ domain }}
+          Найдено лишних записей: {{ count }}
+          {% for ip, id in records %}
+          → {{ ip }} (ID: {{ id }})
+          {% endfor %}
+      loop: "{{ orphaned_records | dict2items }}"
       loop_control:
-        label: "{{ item.content }}"
+        label: "{{ item.key }}"
+      vars:
+        domain: "{{ item.key }}"
+        records: "{{ item.value }}"
+        count: "{{ item.value | length }}"
 
-    - name: 🗑️ API вызов удаления записи
+    # --- ШАГ 8: Подтверждение удаления ---
+    - name: 🛑 Подтвердите удаление записей (введите 'yes')
+      pause:
+        prompt: "⚠️ Будет удалено {{ orphaned_records | dict2items | map(attribute='value') | sum(attribute='|length') | sum }} записей. Введите 'yes' для подтверждения, или Ctrl+C для отмены"
+      register: confirmation
+      when: orphaned_records | length > 0
+
+    # --- ШАГ 9: Удаление A-записей через Porkbun ---
+    - name: 🗑️ Удаляем A-записи неактивных нод
+      vars:
+        orphaned_records_list: "{{ orphaned_records | dict2items | subelements('value') }}"
       uri:
-        url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ domain }}/{{ item.id }}"
+        url: "https://api.porkbun.com/api/json/v3/dns/delete/{{ item.0.key }}/{{ item.1.1 }}"
         method: POST
         body:
           apikey: "{{ porkbun_api_key }}"
           secretapikey: "{{ porkbun_secret_api_key }}"
         body_format: json
         status_code: 200
-      loop: "{{ domain_inactive_records }}"
+      loop: "{{ orphaned_records_list }}"
       loop_control:
-        label: "{{ item.content }}"
+        label: "{{ item.0.key }} → {{ item.1.0 }} (ID: {{ item.1.1 }})"
+      register: delete_results
+      when: confirmation.user_input | default('no') == 'yes'
 
-    - name: ✅ Отчёт об удалении
+    # --- ШАГ 10: Отчёт об удалении ---
+    - name: ✅ Отчёт успешные удаления
       debug:
-        msg: "✅ Удалена запись {{ item.1.name }} → {{ item.1.content }}"
-      loop: "{{ domains_to_process | product(inactive_records) | list }}"
+        msg: "✅ Удалена запись: {{ domain }} → {{ ip }} (ID: {{ record_id }})"
+      loop: "{{ delete_results.results | default([]) }}"
       loop_control:
-        label: "{{ item.0 }} → {{ item.1.content }}"
+        label: "{{ item.item.0.key }} → {{ item.item.1.0 }}"
       vars:
-        domain: "{{ item.0 }}"
-        record: "{{ item.1 }}"
-        inactive_records: >-
-          {{
-            (dns_retrieve_results.results | selectattr('item', 'equalto', domain) | first).json.records
-            | selectattr('type', 'equalto', 'A')
-            | rejectattr('content', 'in', active_nodes)
-            | list
-          }}
+        domain: "{{ item.item.0.key }}"
+        ip: "{{ item.item.1.0 }}"
+        record_id: "{{ item.item.1.1 }}"
+      when: item is defined and item.status == 200
+
+    - name: ❌ Отчёт ошибки при удалении
+      debug:
+        msg: "❌ Ошибка при удалении {{ domain }} → {{ ip }} (ID: {{ record_id }}): {{ item.status }} {{ item.status_text }}"
+      loop: "{{ delete_results.results | default([]) }}"
+      loop_control:
+        label: "{{ item.item.0.key }} → {{ item.item.1.0 }}"
+      vars:
+        domain: "{{ item.item.0.key }}"
+        ip: "{{ item.item.1.0 }}"
+        record_id: "{{ item.item.1.1 }}"
+      when: item is defined and item.status != 200
+
+    # --- ШАГ 11: Финальная сводка ---
+    - name: 📊 Финальный отчёт — что было сделано
+      debug:
+        msg: |-
+          {% set total_deleted = (delete_results.results | default([]) | selectattr('status','equalto',200) | list | length) | int %}
+          {% if total_deleted > 0 %}
+          ✅ УДАЛЕНИЕ ЗАВЕРШЕНО
+
+          Активных нод: {{ active_nodes | length }}
+          Доменов обработано: {{ domains_to_process | length }}
+          Всего удалено записей: {{ total_deleted }}
+          {% else %}
+          ℹ️ УДАЛЕНИЕ НЕ ТРЕБОВАЛОСЬ
+          {% if active_nodes | length == 0 %}
+          → Активных нод не обнаружено.
+          {% else %}
+          → Все A-записи актуальны — удалять нечего.
+          {% endif %}
+          {% endif %}
