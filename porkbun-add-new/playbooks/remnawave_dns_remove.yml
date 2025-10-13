@@ -97,18 +97,16 @@
       set_fact:
         orphaned_records: >-
           {{
-            domains_to_process
-            | map('extract', dns_retrieve_results.results | items2dict(key_name='item', value_name='json'))
-            | map('dict', attribute='records')
-            | zip(domains_to_process)
-            | map('community.general.json_query', "[?type=='A'].{ip: content, id: id}")
-            | zip(domains_to_process)
-            | map('combine', dict)
-            | map('dict', attribute='domain', value='records')
-            | dict
-            | dict2items
-            | map('extract', item.value | rejectattr('ip', 'in', active_ips_set) | list)
-            | select('length') | list
+            dict(
+              domains_to_process | zip(
+                dns_retrieve_results.results
+                | map(attribute='json.records')
+                | map('selectattr', 'type', 'equalto', 'A')
+                | map('selectattr', 'content', 'not in', active_ips_set)
+                | map('map', 'dict', 'ip', 'content', 'id', 'id')
+                | map('list')
+              )
+            )
           }}
 
     - name: 🐞 DEBUG — orphaned_records (IP → ID для удаления)
