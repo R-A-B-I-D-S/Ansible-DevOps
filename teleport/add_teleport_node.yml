@@ -38,46 +38,6 @@
         group: root
         mode: 0644
 
-    - name: Ensure teleport.service.d directory exists
-      file:
-        path: /etc/systemd/system/teleport.service.d
-        state: directory
-        owner: root
-        group: root
-        mode: '0755'
-
-    - name: Create *основной systemd unit-файл* teleport
-      copy:
-        dest: /etc/systemd/system/teleport.service
-        content: |
-          [Unit]
-          Description=Teleport SSH Service
-          After=network.target
-
-          [Service]
-          ExecStart=/usr/bin/teleport start --config=/etc/teleport.yaml
-          Restart=always
-          LimitNOFILE=1048576
-
-          [Install]
-          WantedBy=multi-user.target
-        owner: root
-        group: root
-        mode: 0644
-      notify: Reload systemd
-
-    - name: Create Teleport systemd unit override (if required)
-      copy:
-        dest: /etc/systemd/system/teleport.service.d/override.conf
-        content: |
-          [Service]
-          ExecStart=
-          ExecStart=/usr/bin/teleport start --config=/etc/teleport.yaml --token={{ teleport_token }} --auth-server={{ teleport_auth_server }}
-        owner: root
-        group: root
-        mode: 0644
-      notify: Reload systemd
-
     - name: Enable and restart Teleport service
       systemd:
         name: teleport
