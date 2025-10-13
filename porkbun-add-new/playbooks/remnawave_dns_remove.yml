@@ -65,10 +65,6 @@
       loop_control:
         label: "{{ item }}"
 
-    - name: 🐞 DEBUG — Проверка полученных записей
-      debug:
-        var: dns_retrieve_results.results
-
     # --- ШАГ 3: Построить existing_a_records_map с парами [IP, ID] ---
     - name: 🧩 Построить карту существующих A-записей
       set_fact:
