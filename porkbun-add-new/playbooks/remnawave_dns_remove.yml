@@ -87,27 +87,29 @@
       debug:
         var: existing_a_records_map
 
-    # --- ШАГ 4: Построить множество активных IP ---
+   # --- ШАГ 4: Построить множество активных IP ---
     - name: 🧩 Извлечь множество активных IP
       set_fact:
         active_ips_set: "{{ active_nodes | map(attribute='address') | map('trim') | list | unique }}"
-
+    
     # --- ШАГ 5: Найти лишние записи для удаления ---
     - name: 🧩 Найти лишние A-записи для удаления
       set_fact:
         orphaned_records: >-
-          {%- set orphans = {} -%}
-          {%- for domain in domains_to_process -%}
-            {%- set records = existing_a_records_map[domain] | default([]) -%}
-            {%- set to_delete = [] -%}
-            {%- for ip,id in records -%}
-              {%- if ip not in active_ips_set -%}
-                {%- set _ = to_delete.append([ip,id]) -%}
-              {%- endif -%}
-            {%- endfor -%}
-            {%- set orphans = orphans | combine({domain: to_delete}) -%}
-          {%- endfor -%}
-          {{ orphans }}
+          {{
+            domains_to_process
+            | map('extract', dns_retrieve_results.results | items2dict(key_name='item', value_name='json'))
+            | map('dict', attribute='records')
+            | zip(domains_to_process)
+            | map('community.general.json_query', "[?type=='A'].{ip: content, id: id}")
+            | zip(domains_to_process)
+            | map('combine', dict)
+            | map('dict', attribute='domain', value='records')
+            | dict
+            | dict2items
+            | map('extract', item.value | rejectattr('ip', 'in', active_ips_set) | list)
+            | select('length') | list
+          }}
 
     - name: 🐞 DEBUG — orphaned_records (IP → ID для удаления)
       debug:
