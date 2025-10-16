@@ -1,6 +1,7 @@
 - hosts: servers
   become: true
   vars:
+      teleport_auth_host: "alwyzon@203.98.67.211 -p 11041"
       teleport_package_url: "https://cdn.teleport.dev/teleport_17.7.0_amd64.deb"
       teleport_package_path: "/tmp/teleport-17.7.0.deb"
 
