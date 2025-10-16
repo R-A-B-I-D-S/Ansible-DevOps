@@ -10,6 +10,7 @@
         shell: ssh {{ teleport_auth_host }} "sudo tctl tokens add --type=node"
         register: teleport_token_result
         delegate_to: localhost
+        connection: local
 
       - name: Извлечь сам invite token из вывода
         set_fact:
