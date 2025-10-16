@@ -5,6 +5,17 @@
     teleport_package_path: "/tmp/teleport-17.7.0.deb"
 
   tasks:
+    - name: Получить Teleport invite token по SSH
+      shell: ssh {{ teleport_auth_host }} "sudo tctl tokens add --type=node"
+      register: teleport_token_result
+
+    - name: Извлечь сам invite token из вывода
+      set_fact:
+        teleport_invite_token: "{{ teleport_token_result.stdout | regex_search('token: ([a-zA-Z0-9]+)', '\\1') }}"
+
+    - name: Показать полученный invite token
+      debug:
+        var: teleport_invite_token
     - name: Проверить, что OS семейства Debian/Ubuntu
       assert:
         that: ansible_facts['os_family'] == 'Debian'
@@ -33,7 +44,7 @@
             nodename: ansible
             data_dir: /var/lib/teleport
             join_params:
-              token_name: "{{ teleport_join_token }}"
+              token_name: "{{ teleport_invite_token }}"
               method: token
             proxy_server: teleport.tgvpnbot.com:443
             log:
