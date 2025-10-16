@@ -1,23 +1,18 @@
-- name: Generate Teleport join token
-  hosts: localhost
-  become: true
-  gather_facts: false
+- hosts: localhost
+  gather_facts: yes
+  become: yes
+  vars:
+    teleport_auth_host: "alwyzon@203.98.67.211 -p 11041"
+
   tasks:
-#    - name: Teleport tsh login
-#      shell: tsh login --proxy={{ teleport_proxy }} --user={{ teleport_user }} --auth=local --password={{ teleport_password }}
-#      register: tsh_login_result
-#      ignore_errors: yes  # Можно убрать, если хотите строгое поведение
-#      no_log: true        # Не выводить пароль в логе
+    - name: Получить Teleport invite token по SSH
+      shell: ssh {{ teleport_auth_host }} "sudo tctl tokens add --type=node"
+      register: teleport_token_result
 
-    - name: Generate join token for node
-      command: tctl tokens add --type=node --ttl=1h
-      register: token_result
-
-    - name: Set fact with join token
+    - name: Извлечь сам invite token из вывода
       set_fact:
-        teleport_join_token: "{{ token_result.stdout | regex_search('The invite token: ([a-zA-Z0-9]+)', '\\1') }}"
+        teleport_invite_token: "{{ teleport_token_result.stdout | regex_search('token: ([a-zA-Z0-9]+)', '\\1') }}"
 
-    - name: Show join token
+    - name: Показать полученный invite token
       debug:
-       var: teleport_join_token
-   
+        var: teleport_invite_token

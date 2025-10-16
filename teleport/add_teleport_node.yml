@@ -1,49 +1,67 @@
 - hosts: all
   become: true
+  vars:
+    teleport_package_url: "https://cdn.teleport.dev/teleport_17.7.0_amd64.deb"
+    teleport_package_path: "/tmp/teleport-17.7.0.deb"
 
   tasks:
-  - name: Set Teleport repo URL based on OS
-    set_fact:
-      teleport_repo_url: >-
-        {% if ansible_facts['os_family'] == 'Debian' and ansible_facts['distribution'] | lower == 'ubuntu' %}
-          https://cdn.teleport.dev/teleport_17.7.0_amd64.deb
-        {% elif ansible_facts['os_family'] == 'Debian' and ansible_facts['distribution'] | lower == 'debian' %}
-          https://cdn.teleport.dev/teleport_17.7.0_amd64.deb
-        {% else %}
-          ""
-        {% endif %}
+    - name: Проверить, что OS семейства Debian/Ubuntu
+      assert:
+        that: ansible_facts['os_family'] == 'Debian'
+        fail_msg: "Установка только для Debian/Ubuntu!"
 
-    - name: Show which OS and repo URL will be used
-      debug:
-        msg: "Detected OS: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }} → Repo: {{ teleport_repo_url }}"
-
-    - name: Download Teleport repository package
+    - name: Скачать Teleport DEB
       get_url:
-        url: "{{ teleport_repo_url }}"
-        dest: /tmp/teleport-17.7.0.deb
+        url: "{{ teleport_package_url }}"
+        dest: "{{ teleport_package_path }}"
         mode: '0644'
-      when: teleport_repo_url != ""
 
-    - name: Install Teleport repository
+    - name: Установить Teleport
       apt:
-        deb: /tmp/teleport-17.7.0.deb
+        deb: "{{ teleport_package_path }}"
         state: present
-      when: teleport_repo_url != ""
 
-    - name: Deploy teleport.yaml (with proper nodename and label)
-      template:
-        src: teleport.yaml.j2
+    - name: Развернуть teleport.yaml из текста
+      copy:
         dest: /etc/teleport.yaml
         owner: root
         group: root
-        mode: 0644
+        mode: '0644'
+        content: |
+          version: v3
+          teleport:
+            nodename: ansible
+            data_dir: /var/lib/teleport
+            join_params:
+              token_name: "{{ teleport_join_token }}"
+              method: token
+            proxy_server: teleport.tgvpnbot.com:443
+            log:
+              output: stderr
+              severity: INFO
+              format:
+                output: text
+            ca_pin: sha256:15069b6d75043ab3cc8ebf8a312e6f95b2d82c30bee210e49b5f7e6498c378b9
+            diag_addr: ""
+          auth_service:
+            enabled: "no"
+          ssh_service:
+            enabled: "yes"
+            labels:
+              infrastructure: ansible
+              teleport.internal/resource-id: aa08deb2-2646-4b21-aacc-cd14e573c243
+          proxy_service:
+            enabled: "no"
+            https_keypairs: []
+            https_keypairs_reload_interval: 0s
+            acme: {}
 
-    - name: Enable and restart Teleport service
+    - name: Перечитать systemd (на всякий случай)
+      command: systemctl daemon-reload
+      changed_when: false
+
+    - name: Включить и запустить teleport
       systemd:
         name: teleport
         state: restarted
         enabled: yes
-
-  handlers:
-    - name: Reload systemd
-      command: systemctl daemon-reload
