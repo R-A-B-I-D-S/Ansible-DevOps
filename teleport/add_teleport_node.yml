@@ -1,24 +1,10 @@
 - hosts: servers
   become: true
   vars:
-      teleport_auth_host: "alwyzon@203.98.67.211 -p 11041"
       teleport_package_url: "https://cdn.teleport.dev/teleport_17.7.0_amd64.deb"
       teleport_package_path: "/tmp/teleport-17.7.0.deb"
 
   tasks:
-      - name: Получить Teleport invite token по SSH
-        shell: ssh {{ teleport_auth_host }} "sudo tctl tokens add --type=node"
-        register: teleport_token_result
-        delegate_to: localhost
-        connection: local
-
-      - name: Извлечь сам invite token из вывода
-        set_fact:
-            teleport_invite_token: "{{ teleport_token_result.stdout | regex_search('token: ([a-zA-Z0-9]+)', '\\1') }}"
-
-      - name: Показать полученный invite token
-        debug:
-            var: teleport_invite_token
       - name: Проверить, что OS семейства Debian/Ubuntu
         assert:
             that: ansible_facts['os_family'] == 'Debian'
