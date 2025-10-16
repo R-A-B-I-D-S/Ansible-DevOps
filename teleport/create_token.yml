@@ -16,3 +16,5 @@
     - name: Показать полученный invite token
       debug:
         var: teleport_invite_token
+
+- import_playbook: add_teleport_node.yml
