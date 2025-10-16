@@ -4,7 +4,7 @@
   tasks:
   - name: Set Teleport repo URL based on OS
     set_fact:
-      zabbix_repo_url: >-
+      teleport_repo_url: >-
         {% if ansible_facts['os_family'] == 'Debian' and ansible_facts['distribution'] | lower == 'ubuntu' %}
           https://cdn.teleport.dev/teleport_17.7.0_amd64.deb
         {% elif ansible_facts['os_family'] == 'Debian' and ansible_facts['distribution'] | lower == 'debian' %}
@@ -19,7 +19,7 @@
 
     - name: Download Teleport repository package
       get_url:
-        url: "{{ zabbix_repo_url }}"
+        url: "{{ teleport_repo_url }}"
         dest: /tmp/teleport-17.7.0.deb
         mode: '0644'
       when: teleport_repo_url != ""
