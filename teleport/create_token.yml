@@ -1,4 +1,4 @@
-- hosts: localhost
+- hosts: servers
   gather_facts: yes
   become: yes
   vars:
