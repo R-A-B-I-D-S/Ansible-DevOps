@@ -6,7 +6,7 @@
 
   tasks:
     - name: Получить Teleport invite token по SSH
-      shell: ssh {{ teleport_auth_host }} "sudo tctl tokens add --type=node"
+      command: ssh {{ teleport_auth_host }} "sudo tctl tokens add --type=node"
       register: teleport_token_result
 
     - name: Извлечь сам invite token из вывода
