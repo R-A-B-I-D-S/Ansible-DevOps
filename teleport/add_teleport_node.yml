@@ -3,9 +3,14 @@
   vars:
       teleport_package_url: "https://cdn.teleport.dev/teleport_17.7.0_amd64.deb"
       teleport_package_path: "/tmp/teleport-17.7.0.deb"
-      teleport_invite_token: "{{ hostvars['localhost']['teleport_invite_token'] }}"
+      teleport_invite_token: "{{ teleport_invite_token | default('') }}"
 
   tasks:
+      - name: Загрузить токен из файла
+        include_vars:
+          file: /tmp/teleport_token.yml
+        ignore_errors: yes
+
       - name: Проверить наличие токена Teleport
         fail:
             msg: "Токен Teleport не найден! Проверьте выполнение предыдущего плейбука"
@@ -30,7 +35,7 @@
       - name: Развернуть teleport.yaml из шаблона
         template:
             src: teleport.yaml.j2
-            dest: /etс/teleport.yaml
+            dest: /etc/teleport.yaml
             owner: root
             group: root
             mode: "0644"
