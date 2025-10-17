@@ -2,27 +2,11 @@
   gather_facts: yes
   become: yes
   vars:
-    teleport_auth_host: "alwyzon@203.98.67.211"
-    teleport_auth_port: "11041"
-    teleport_auth_user: "alwyzon"
-    ssh_timeout: 30
+    teleport_auth_host: "alwyzon@203.98.67.211 -p 11041"
 
   tasks:
-    - name: Проверить доступность Teleport auth сервера
-      wait_for:
-        host: "{{ teleport_auth_host }}"
-        port: "{{ teleport_auth_port }}"
-        timeout: 10
-      delegate_to: localhost
-
     - name: Получить Teleport invite token по SSH
-      command: >
-        ssh -o ConnectTimeout={{ ssh_timeout }} 
-             -o StrictHostKeyChecking=no 
-             -o UserKnownHostsFile=/dev/null 
-             -p {{ teleport_auth_port }} 
-             {{ teleport_auth_user }}@{{ teleport_auth_host }} 
-             "sudo tctl tokens add --type=node"
+      shell: ssh {{ teleport_auth_host }} "sudo tctl tokens add --type=node"
       register: teleport_token_result
       failed_when: teleport_token_result.rc != 0
       changed_when: false
