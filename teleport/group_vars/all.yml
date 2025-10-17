@@ -1,5 +1,0 @@
-teleport_token: "659868b9ef71898ee2ecda7871b1383c"
-teleport_auth_server: "teleport.tgvpnbot.com:443"
-teleport_nodename: "{{ inventory_hostname }}"
-teleport_labels:
-  vpn: "{{ server_name }}"
