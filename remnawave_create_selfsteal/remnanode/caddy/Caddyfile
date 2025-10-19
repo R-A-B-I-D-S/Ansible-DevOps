@@ -1,6 +1,6 @@
 {
     storage redis {
-        host 144.31.2.123
+        host remnawave.tgvpnbot.com
         port 6379
         password UQlm12LOr9I1lu
         key_prefix caddy_
